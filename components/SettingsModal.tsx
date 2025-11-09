@@ -1,0 +1,87 @@
+import React from 'react';
+import { useTranslation } from '../hooks/useLocalization';
+
+interface SettingsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
+  font: 'default' | 'dyslexia-friendly';
+  setFont: (font: 'default' | 'dyslexia-friendly') => void;
+  language: 'en' | 'es';
+  setLanguage: (language: 'en' | 'es') => void;
+  isTeacherMode: boolean;
+  setIsTeacherMode: (isTeacher: boolean) => void;
+}
+
+const SettingsModal: React.FC<SettingsModalProps> = ({
+  isOpen, onClose, theme, setTheme, font, setFont, language, setLanguage, isTeacherMode, setIsTeacherMode
+}) => {
+  const { t } = useTranslation();
+
+  if (!isOpen) return null;
+
+  const handleTeacherModeToggle = () => {
+    setIsTeacherMode(!isTeacherMode);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full transform transition-all animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
+        <h2 className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-6">{t('appSettings')}</h2>
+        
+        <div className="space-y-6">
+          {/* Theme Setting */}
+          <div>
+            <label className="font-bold text-gray-700 dark:text-gray-200">{t('theme')}</label>
+            <div className="flex gap-2 mt-2">
+              <button onClick={() => setTheme('light')} className={`w-full py-2 rounded-lg ${theme === 'light' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('light')}</button>
+              <button onClick={() => setTheme('dark')} className={`w-full py-2 rounded-lg ${theme === 'dark' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('dark')}</button>
+            </div>
+          </div>
+          {/* Font Setting */}
+          <div>
+            <label className="font-bold text-gray-700 dark:text-gray-200">{t('font')}</label>
+            <div className="flex gap-2 mt-2">
+              <button onClick={() => setFont('default')} className={`w-full py-2 rounded-lg ${font === 'default' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('default')}</button>
+              <button onClick={() => setFont('dyslexia-friendly')} className={`w-full py-2 rounded-lg ${font === 'dyslexia-friendly' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('dyslexiaFriendly')}</button>
+            </div>
+          </div>
+          {/* Language Setting */}
+          <div>
+            <label className="font-bold text-gray-700 dark:text-gray-200">{t('language')}</label>
+            <div className="flex gap-2 mt-2">
+              <button onClick={() => setLanguage('en')} className={`w-full py-2 rounded-lg ${language === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('english')}</button>
+              <button onClick={() => setLanguage('es')} className={`w-full py-2 rounded-lg ${language === 'es' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('spanish')}</button>
+            </div>
+          </div>
+          {/* Teacher Mode Setting */}
+          <div className="border-t pt-4 border-gray-200 dark:border-gray-600">
+             <label className="font-bold text-gray-700 dark:text-gray-200">Teacher Mode</label>
+             <div className="flex items-center justify-between mt-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300">Access the classroom dashboard.</p>
+                <button
+                    onClick={handleTeacherModeToggle}
+                    className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${
+                        isTeacherMode ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                    }`}
+                >
+                    <span
+                        className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
+                            isTeacherMode ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                    />
+                </button>
+             </div>
+          </div>
+        </div>
+
+        <button onClick={onClose} className="mt-8 w-full bg-gray-700 text-white font-bold py-3 rounded-lg hover:bg-gray-800 dark:bg-gray-500 dark:hover:bg-gray-400">
+          {t('close')}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default SettingsModal;
