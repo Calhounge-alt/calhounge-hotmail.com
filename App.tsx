@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { LocalizationProvider } from './hooks/useLocalization';
 import { CommunityStory, ReactionType, ShopItem, AvatarState, ProgressStep } from './types';
@@ -52,7 +53,6 @@ const App: React.FC = () => {
   }, [theme]);
 
   useEffect(() => {
-    document.body.style.fontFamily = font === 'dyslexia-friendly' ? "'Comic Sans MS', sans-serif" : ""; // Example font
     localStorage.setItem('font', font);
   }, [font]);
   
@@ -181,8 +181,8 @@ const App: React.FC = () => {
   const showNav = appStep !== 'welcome' && appStep !== 'hub';
 
   return (
-    <LocalizationProvider>
-        <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans transition-colors duration-300 ${font === 'dyslexia-friendly' ? 'font-dyslexia' : ''}`}>
+    <LocalizationProvider language={language} setLanguage={setLanguage}>
+        <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 ${font === 'dyslexia-friendly' ? 'font-dyslexia-friendly' : 'font-default'}`}>
             <Header
                 userName={userName || 'Creator'}
                 onSettingsClick={() => setIsSettingsOpen(true)}

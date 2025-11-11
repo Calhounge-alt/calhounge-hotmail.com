@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+
+import React, { createContext, useContext, ReactNode } from 'react';
 import { translations } from '../translations';
 
 type Language = 'en' | 'es';
 type TranslationKey = keyof (typeof translations)['en'];
 
-interface LocalizationContextType {
+export interface LocalizationContextType {
   language: Language;
   setLanguage: (language: Language) => void;
   t: (key: TranslationKey, params?: Record<string, string | number>) => string;
@@ -12,9 +13,13 @@ interface LocalizationContextType {
 
 const LocalizationContext = createContext<LocalizationContextType | undefined>(undefined);
 
-export const LocalizationProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('en');
+interface LocalizationProviderProps {
+    children: ReactNode;
+    language: Language;
+    setLanguage: (language: Language) => void;
+}
 
+export const LocalizationProvider = ({ children, language, setLanguage }: LocalizationProviderProps) => {
   const t = (key: TranslationKey, params?: Record<string, string | number>): string => {
     let text: string = (translations[language] && translations[language][key]) || translations['en'][key];
     if (params) {
@@ -26,8 +31,6 @@ export const LocalizationProvider = ({ children }: { children: ReactNode }) => {
     return text;
   };
 
-  // FIX: Replaced JSX with React.createElement to avoid JSX parsing issues in a .ts file.
-  // This resolves errors related to incorrect parsing of JSX syntax.
   return React.createElement(LocalizationContext.Provider, { value: { language, setLanguage, t } }, children);
 };
 
