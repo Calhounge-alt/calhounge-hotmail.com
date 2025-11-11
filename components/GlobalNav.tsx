@@ -1,5 +1,5 @@
 import React from 'react';
-import { playSound } from '../utils/soundUtils';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface GlobalNavProps {
   onBack: () => void;

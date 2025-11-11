@@ -1,6 +1,6 @@
 import React from 'react';
-import { FREEDOM_FIGHTERS_SCENARIOS, FreedomFighterScenario } from '../data/freedomFightersScenarios';
-import { playSound } from '../utils/soundUtils';
+import { FREEDOM_FIGHTERS_SCENARIOS, FreedomFighterScenario } from '../data/freedomFightersScenarios.ts';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface FreedomFightersZoneProps {
   onBackToHub: () => void;

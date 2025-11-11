@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ProgressStep } from '../types';
+import { ProgressStep } from '../types.ts';
 
 interface ProgressHUDProps {
   completedSteps: Set<ProgressStep>;

@@ -1,10 +1,11 @@
 
+
 import React from 'react';
-import { useTranslation } from '../hooks/useLocalization';
-import AvatarDisplay from './AvatarDisplay';
-import { AvatarState } from '../types';
-import { HomeIcon } from './Icons';
-import { playSound } from '../utils/soundUtils';
+import { useTranslation } from '../hooks/useLocalization.ts';
+import AvatarDisplay from './AvatarDisplay.tsx';
+import { AvatarState } from '../types.ts';
+import { HomeIcon } from './Icons.tsx';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface HeaderProps {
     userName: string;

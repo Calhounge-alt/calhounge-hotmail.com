@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { CLASSROOM_DATA } from '../data/teacherViewData';
-import { Student } from '../data/teacherViewData';
-import Timer from './Timer';
-import StudentPod from './StudentPod';
-import ProjectorView from './ProjectorView';
-import EyesOnMeOverlay from './EyesOnMeOverlay';
-import ReflectionsViewer from './ReflectionsViewer';
+import { CLASSROOM_DATA } from '../data/teacherViewData.ts';
+import { Student } from '../data/teacherViewData.ts';
+import Timer from './Timer.tsx';
+import StudentPod from './StudentPod.tsx';
+import ProjectorView from './ProjectorView.tsx';
+import EyesOnMeOverlay from './EyesOnMeOverlay.tsx';
+import ReflectionsViewer from './ReflectionsViewer.tsx';
 
 const TeacherControlPanel: React.FC = () => {
   const [students] = useState<Student[]>(CLASSROOM_DATA);

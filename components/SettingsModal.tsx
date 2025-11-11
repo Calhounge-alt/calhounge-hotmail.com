@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from '../hooks/useLocalization';
-import { useApiKey } from '../hooks/useApiKey';
-import { playSound } from '../utils/soundUtils';
+import { useTranslation } from '../hooks/useLocalization.ts';
+import { useApiKey } from '../hooks/useApiKey.tsx';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface SettingsModalProps {
   isOpen: boolean;

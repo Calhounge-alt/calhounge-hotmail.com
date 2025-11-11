@@ -1,5 +1,5 @@
 import React from 'react';
-import { Student } from '../data/teacherViewData';
+import { Student } from '../data/teacherViewData.ts';
 
 interface ProjectorViewProps {
   student: Student;

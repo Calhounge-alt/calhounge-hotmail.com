@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { playSound } from '../utils/soundUtils';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface SubmissionModalProps {
   isOpen: boolean;

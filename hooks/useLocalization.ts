@@ -1,6 +1,7 @@
 
+
 import React, { createContext, useContext, ReactNode } from 'react';
-import { translations } from '../translations';
+import { translations } from '../translations/index.ts';
 
 type Language = 'en' | 'es';
 type TranslationKey = keyof (typeof translations)['en'];

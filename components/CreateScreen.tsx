@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArtStyle, Vibe, VoiceName, Character, ProgressStep } from '../types';
-import { explainPrompt, generateStory, generateImage, generateSpeech } from '../services/geminiService';
-import { decode, decodeAudioData } from '../utils/audioUtils';
-import { playSound } from '../utils/soundUtils';
-import VibeSelector from './VibeSelector';
-import VoiceSelector from './VoiceSelector';
-import CharacterCustomizer from './CharacterCustomizer';
-import MusicCreator from './MusicCreator';
-import LabJournal from './LabJournal';
-import { PlayIcon, PauseIcon, StopIcon } from './Icons';
-import PromptTemplates from './PromptTemplates';
-import InspirationDeckModal from './InspirationDeckModal';
-import SubmissionModal from './SubmissionModal';
-import ProgressHUD from './ProgressHUD';
-import CreativityMeterModal from './CreativityMeterModal';
+import { ArtStyle, Vibe, VoiceName, Character, ProgressStep } from '../types.ts';
+import { explainPrompt, generateStory, generateImage, generateSpeech } from '../services/geminiService.ts';
+import { decode, decodeAudioData } from '../utils/audioUtils.ts';
+import { playSound } from '../utils/soundUtils.ts';
+import VibeSelector from './VibeSelector.tsx';
+import VoiceSelector from './VoiceSelector.tsx';
+import CharacterCustomizer from './CharacterCustomizer.tsx';
+import MusicCreator from './MusicCreator.tsx';
+import LabJournal from './LabJournal.tsx';
+import { PlayIcon, PauseIcon, StopIcon } from './Icons.tsx';
+import PromptTemplates from './PromptTemplates.tsx';
+import InspirationDeckModal from './InspirationDeckModal.tsx';
+import SubmissionModal from './SubmissionModal.tsx';
+import ProgressHUD from './ProgressHUD.tsx';
+import CreativityMeterModal from './CreativityMeterModal.tsx';
 
 interface CreateScreenProps {
   onBackToHub: () => void;

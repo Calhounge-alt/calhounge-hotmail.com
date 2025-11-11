@@ -1,6 +1,6 @@
 import React from 'react';
-import { VoiceName, VOICE_OPTIONS } from '../types';
-import { playSound } from '../utils/soundUtils';
+import { VoiceName, VOICE_OPTIONS } from '../types.ts';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface VoiceSelectorProps {
   selectedVoice: VoiceName;

@@ -1,6 +1,6 @@
 import React from 'react';
-import { GTCWorldChangerStory } from '../types';
-import { BadgeCheckIcon } from './Icons';
+import { GTCWorldChangerStory } from '../types.ts';
+import { BadgeCheckIcon } from './Icons.tsx';
 
 interface GTCStoryCardProps {
   story: GTCWorldChangerStory;

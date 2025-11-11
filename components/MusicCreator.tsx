@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { MusicStyle, CustomMusicParams, TEMPO_OPTIONS, ENERGY_LEVEL_OPTIONS, EMOTION_OPTIONS, MUSIC_STYLE_OPTIONS } from '../types';
-import { generateMusic } from '../services/geminiService';
-import { playSound } from '../utils/soundUtils';
+import { MusicStyle, CustomMusicParams, TEMPO_OPTIONS, ENERGY_LEVEL_OPTIONS, EMOTION_OPTIONS, MUSIC_STYLE_OPTIONS } from '../types.ts';
+import { generateMusic } from '../services/geminiService.ts';
+import { playSound } from '../utils/soundUtils.ts';
 
 // Reusable Segmented Control for custom music params
 const ParamSelector = <T extends string>({

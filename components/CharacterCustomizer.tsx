@@ -1,6 +1,6 @@
 import React from 'react';
-import { Character, CharacterTrait, PERSONALITY_TRAITS, HAIR_TRAITS, EYE_TRAITS, CLOTHING_TRAITS, BODY_TYPE_TRAITS, ACCESSORY_TRAITS } from '../types';
-import { playSound } from '../utils/soundUtils';
+import { Character, CharacterTrait, PERSONALITY_TRAITS, HAIR_TRAITS, EYE_TRAITS, CLOTHING_TRAITS, BODY_TYPE_TRAITS, ACCESSORY_TRAITS } from '../types.ts';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface CharacterCustomizerProps {
   character: Character;

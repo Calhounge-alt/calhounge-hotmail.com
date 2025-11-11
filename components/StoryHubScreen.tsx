@@ -1,9 +1,10 @@
 
 
+
 import React, { useState } from 'react';
-import { CommunityStory, ReactionType } from '../types';
-import CommunityStoryCard from './CommunityStoryCard';
-import { playSound } from '../utils/soundUtils';
+import { CommunityStory, ReactionType } from '../types.ts';
+import CommunityStoryCard from './CommunityStoryCard.tsx';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface StoryHubScreenProps {
     stories: CommunityStory[];

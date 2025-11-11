@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { initializeAiClient, isAiClientInitialized } from '../services/geminiService';
+import { initializeAiClient, isAiClientInitialized } from '../services/geminiService.ts';
 
 interface ApiKeyContextType {
   apiKey: string | null;

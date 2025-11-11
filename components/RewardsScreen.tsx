@@ -1,6 +1,7 @@
 
+
 import React, { useEffect } from 'react';
-import { playSound } from '../utils/soundUtils';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface RewardsScreenProps {
   userName: string;

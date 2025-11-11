@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { CommunityStory, ReactionType } from '../types';
-import { LightbulbIcon, PaletteIcon, ThoughtBubbleIcon, PlayIcon, PauseIcon, StopIcon } from './Icons';
-import { generateSpeech } from '../services/geminiService';
-import { decode, decodeAudioData } from '../utils/audioUtils';
-import { playSound } from '../utils/soundUtils';
+import { CommunityStory, ReactionType } from '../types.ts';
+import { LightbulbIcon, PaletteIcon, ThoughtBubbleIcon, PlayIcon, PauseIcon, StopIcon } from './Icons.tsx';
+import { generateSpeech } from '../services/geminiService.ts';
+import { decode, decodeAudioData } from '../utils/audioUtils.ts';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface CommunityStoryCardProps {
     story: CommunityStory;

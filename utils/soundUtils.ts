@@ -1,5 +1,5 @@
 // utils/soundUtils.ts
-import { SoundEffect } from '../types';
+import { SoundEffect } from '../types.ts';
 
 const SOUND_MAP: Record<SoundEffect, string> = {
   click: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_23b3719ab2.mp3',

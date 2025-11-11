@@ -1,6 +1,6 @@
 import React from 'react';
-import { useTranslation } from '../hooks/useLocalization';
-import { playSound } from '../utils/soundUtils';
+import { useTranslation } from '../hooks/useLocalization.ts';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface HubScreenProps {
   userName: string;

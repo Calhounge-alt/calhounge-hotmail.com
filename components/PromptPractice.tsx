@@ -1,10 +1,11 @@
 
 
+
 import React, { useState, useEffect } from 'react';
-import { analyzePrompt } from '../services/geminiService';
-import { PromptAnalysis } from '../types';
-import PromptTemplates from './PromptTemplates';
-import { playSound } from '../utils/soundUtils';
+import { analyzePrompt } from '../services/geminiService.ts';
+import { PromptAnalysis } from '../types.ts';
+import PromptTemplates from './PromptTemplates.tsx';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface PromptPracticeProps {
   setNextDisabled: (disabled: boolean) => void;

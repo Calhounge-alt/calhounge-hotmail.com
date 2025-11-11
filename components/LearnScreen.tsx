@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { generateSpeech } from '../services/geminiService';
-import { decode, decodeAudioData } from '../utils/audioUtils';
-import { playSound } from '../utils/soundUtils';
-import { PlayIcon, PauseIcon, StopIcon } from './Icons';
+import { generateSpeech } from '../services/geminiService.ts';
+import { decode, decodeAudioData } from '../utils/audioUtils.ts';
+import { playSound } from '../utils/soundUtils.ts';
+import { PlayIcon, PauseIcon, StopIcon } from './Icons.tsx';
 
 interface LearnScreenProps {
   onBack: () => void;

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Vibe, VIBE_OPTIONS } from '../types';
-import { playSound } from '../utils/soundUtils';
+import { Vibe, VIBE_OPTIONS } from '../types.ts';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface VibeSelectorProps {
   selectedVibe: Vibe | null;

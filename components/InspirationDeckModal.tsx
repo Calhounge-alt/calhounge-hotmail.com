@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { INSPIRATION_PROMPTS } from '../data/inspirationPrompts';
-import { playSound } from '../utils/soundUtils';
+import { INSPIRATION_PROMPTS } from '../data/inspirationPrompts.ts';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface InspirationDeckModalProps {
   isOpen: boolean;

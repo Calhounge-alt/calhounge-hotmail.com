@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ETHICS_PROMPTS, EthicsPrompt, EthicsPromptCategory } from '../data/ethicsPrompts';
-import { playSound } from '../utils/soundUtils';
+import { ETHICS_PROMPTS, EthicsPrompt, EthicsPromptCategory } from '../data/ethicsPrompts.ts';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface EthicsPlaygroundProps {
   onBackToHub: () => void;

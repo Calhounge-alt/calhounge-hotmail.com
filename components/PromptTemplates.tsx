@@ -1,5 +1,5 @@
 import React from 'react';
-import { PROMPT_TEMPLATES } from '../data/promptTemplates';
+import { PROMPT_TEMPLATES } from '../data/promptTemplates.ts';
 
 interface PromptTemplatesProps {
   onSelect: (prompt: string) => void;

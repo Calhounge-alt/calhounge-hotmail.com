@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { ShopItem } from '../types';
-import { playSound } from '../utils/soundUtils';
+import { ShopItem } from '../types.ts';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface PurchaseConfirmationModalProps {
   isOpen: boolean;

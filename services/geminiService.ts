@@ -1,5 +1,5 @@
 import { GoogleGenAI, Modality, Type } from "@google/genai";
-import { PromptAnalysis, ArtStyle, Vibe, VoiceName, MusicStyle, CustomMusicParams } from "../types";
+import { PromptAnalysis, ArtStyle, Vibe, VoiceName, MusicStyle, CustomMusicParams } from "../types.ts";
 
 let ai: GoogleGenAI | null = null;
 

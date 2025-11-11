@@ -1,6 +1,6 @@
 import React from 'react';
-import { Student } from '../data/teacherViewData';
-import { ProgressStep } from '../types';
+import { Student } from '../data/teacherViewData.ts';
+import { ProgressStep } from '../types.ts';
 
 interface StudentPodProps {
   student: Student;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useApiKey } from '../hooks/useApiKey';
-import { playSound } from '../utils/soundUtils';
+import { useApiKey } from '../hooks/useApiKey.tsx';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface ApiKeyModalProps {
   isOpen: boolean;

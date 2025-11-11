@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { SHOP_ITEMS } from '../data/shopItems';
-import { ShopItem, ShopCategory, AvatarState } from '../types';
-import AvatarDisplay from './AvatarDisplay';
-import PurchaseConfirmationModal from './PurchaseConfirmationModal';
-import { playSound } from '../utils/soundUtils';
+import { SHOP_ITEMS } from '../data/shopItems.ts';
+import { ShopItem, ShopCategory, AvatarState } from '../types.ts';
+import AvatarDisplay from './AvatarDisplay.tsx';
+import PurchaseConfirmationModal from './PurchaseConfirmationModal.tsx';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface ShopScreenProps {
   onBackToHub: () => void;

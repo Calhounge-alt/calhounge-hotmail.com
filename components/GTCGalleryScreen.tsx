@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { GTC_WORLD_CHANGERS_STORIES } from '../data/gtcWorldChangers';
-import { GTC_CATEGORIES, GTC_CategoryKey } from '../types';
-import GTCStoryCard from './GTCStoryCard';
-import { playSound } from '../utils/soundUtils';
+import { GTC_WORLD_CHANGERS_STORIES } from '../data/gtcWorldChangers.ts';
+import { GTC_CATEGORIES, GTC_CategoryKey } from '../types.ts';
+import GTCStoryCard from './GTCStoryCard.tsx';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface GTCGalleryScreenProps {
   onBackToHub: () => void;

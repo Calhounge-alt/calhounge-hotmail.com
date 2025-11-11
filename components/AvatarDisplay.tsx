@@ -1,5 +1,5 @@
 import React from 'react';
-import { AvatarState } from '../types';
+import { AvatarState } from '../types.ts';
 
 interface AvatarDisplayProps {
   avatarState: AvatarState;

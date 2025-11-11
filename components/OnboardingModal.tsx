@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { playSound } from '../utils/soundUtils';
+import { playSound } from '../utils/soundUtils.ts';
 
 interface OnboardingModalProps {
   isOpen: boolean;
