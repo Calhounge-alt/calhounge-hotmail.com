@@ -3,6 +3,7 @@ import { SHOP_ITEMS } from '../data/shopItems';
 import { ShopItem, ShopCategory, AvatarState } from '../types';
 import AvatarDisplay from './AvatarDisplay';
 import PurchaseConfirmationModal from './PurchaseConfirmationModal';
+import { playSound } from '../utils/soundUtils';
 
 interface ShopScreenProps {
   onBackToHub: () => void;
@@ -11,18 +12,21 @@ interface ShopScreenProps {
   onPurchase: (item: ShopItem) => void;
   onEquip: (item: ShopItem) => void;
   purchasedItems: Set<number>;
+  isSoundEnabled: boolean;
 }
 
-const ShopScreen: React.FC<ShopScreenProps> = ({ onBackToHub, avatarState, coins, onPurchase, onEquip, purchasedItems }) => {
+const ShopScreen: React.FC<ShopScreenProps> = ({ onBackToHub, avatarState, coins, onPurchase, onEquip, purchasedItems, isSoundEnabled }) => {
   const [activeTab, setActiveTab] = useState<ShopCategory>('hats');
   const [itemToBuy, setItemToBuy] = useState<ShopItem | null>(null);
 
   const filteredItems = SHOP_ITEMS.filter(item => item.category === activeTab);
   
   const handlePurchaseClick = (item: ShopItem) => {
+    playSound('click', isSoundEnabled);
     if (coins >= item.price) {
       setItemToBuy(item);
     } else {
+      playSound('error', isSoundEnabled);
       alert("You don't have enough coins!");
     }
   };
@@ -39,6 +43,21 @@ const ShopScreen: React.FC<ShopScreenProps> = ({ onBackToHub, avatarState, coins
            (avatarState.accessory?.id === item.id) || 
            (avatarState.background?.id === item.id);
   };
+
+  const handleTabClick = (cat: ShopCategory) => {
+    playSound('click', isSoundEnabled);
+    setActiveTab(cat);
+  };
+
+  const handleEquipClick = (item: ShopItem) => {
+    playSound('click', isSoundEnabled);
+    onEquip(item);
+  };
+  
+  const handleBackToHub = () => {
+    playSound('click', isSoundEnabled);
+    onBackToHub();
+  }
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-fade-in-up">
@@ -63,7 +82,7 @@ const ShopScreen: React.FC<ShopScreenProps> = ({ onBackToHub, avatarState, coins
             {(['hats', 'accessories', 'backgrounds'] as ShopCategory[]).map(cat => (
               <button
                 key={cat}
-                onClick={() => setActiveTab(cat)}
+                onClick={() => handleTabClick(cat)}
                 className={`capitalize px-6 py-3 font-semibold text-lg border-b-4 transition-colors ${
                   activeTab === cat ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
                 }`}
@@ -80,7 +99,7 @@ const ShopScreen: React.FC<ShopScreenProps> = ({ onBackToHub, avatarState, coins
                 <p className="font-semibold text-sm text-gray-800 dark:text-gray-100">{item.name}</p>
                 {purchasedItems.has(item.id) ? (
                   <button 
-                    onClick={() => onEquip(item)}
+                    onClick={() => handleEquipClick(item)}
                     disabled={isEquipped(item)}
                     className="mt-2 w-full text-sm font-bold py-1.5 rounded-md transition-colors bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400 dark:disabled:bg-gray-500"
                   >
@@ -104,7 +123,7 @@ const ShopScreen: React.FC<ShopScreenProps> = ({ onBackToHub, avatarState, coins
 
       <div className="text-center">
         <button 
-          onClick={onBackToHub}
+          onClick={handleBackToHub}
           className="bg-gray-600 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-700 transition-all transform hover:scale-105"
         >
           Back to Hub
@@ -116,6 +135,7 @@ const ShopScreen: React.FC<ShopScreenProps> = ({ onBackToHub, avatarState, coins
         item={itemToBuy}
         onConfirm={confirmPurchase}
         onClose={() => setItemToBuy(null)}
+        isSoundEnabled={isSoundEnabled}
       />
     </div>
   );

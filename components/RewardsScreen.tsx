@@ -1,15 +1,18 @@
 
 import React, { useEffect } from 'react';
+import { playSound } from '../utils/soundUtils';
 
 interface RewardsScreenProps {
   userName: string;
   setNextDisabled: (disabled: boolean) => void;
+  isSoundEnabled: boolean;
 }
 
-const RewardsScreen: React.FC<RewardsScreenProps> = ({ userName, setNextDisabled }) => {
+const RewardsScreen: React.FC<RewardsScreenProps> = ({ userName, setNextDisabled, isSoundEnabled }) => {
   useEffect(() => {
     setNextDisabled(false);
-  }, [setNextDisabled]);
+    playSound('badge', isSoundEnabled);
+  }, [setNextDisabled, isSoundEnabled]);
   
   return (
     <div className="max-w-2xl mx-auto text-center animate-fade-in-up">

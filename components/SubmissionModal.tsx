@@ -1,21 +1,38 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { playSound } from '../utils/soundUtils';
 
 interface SubmissionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  isSoundEnabled: boolean;
 }
 
-const SubmissionModal: React.FC<SubmissionModalProps> = ({ isOpen, onClose, onConfirm }) => {
+const SubmissionModal: React.FC<SubmissionModalProps> = ({ isOpen, onClose, onConfirm, isSoundEnabled }) => {
+  const prevIsOpen = useRef(isOpen);
+
+  useEffect(() => {
+    if (isOpen && !prevIsOpen.current) {
+        playSound('whoosh', isSoundEnabled);
+    }
+    prevIsOpen.current = isOpen;
+  }, [isOpen, isSoundEnabled]);
+
   if (!isOpen) return null;
 
   const handleConfirm = () => {
+    playSound('success', isSoundEnabled);
     onConfirm();
     onClose();
   };
 
+  const handleClose = () => {
+    playSound('click', isSoundEnabled);
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={handleClose}>
       <div 
         className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md w-full text-center transform transition-all animate-fade-in-up" 
         onClick={(e) => e.stopPropagation()}
@@ -28,7 +45,7 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({ isOpen, onClose, onCo
         
         <div className="flex justify-center gap-4 mt-6">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-100 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
           >
             Not Yet

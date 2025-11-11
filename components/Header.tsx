@@ -1,7 +1,10 @@
+
 import React from 'react';
 import { useTranslation } from '../hooks/useLocalization';
 import AvatarDisplay from './AvatarDisplay';
 import { AvatarState } from '../types';
+import { HomeIcon } from './Icons';
+import { playSound } from '../utils/soundUtils';
 
 interface HeaderProps {
     userName: string;
@@ -10,10 +13,21 @@ interface HeaderProps {
     showHubButton: boolean;
     avatarState: AvatarState;
     coins: number;
+    isSoundEnabled: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ userName, onSettingsClick, onHubClick, showHubButton, avatarState, coins }) => {
+const Header: React.FC<HeaderProps> = ({ userName, onSettingsClick, onHubClick, showHubButton, avatarState, coins, isSoundEnabled }) => {
     const { t } = useTranslation();
+
+    const handleSettingsClick = () => {
+        playSound('click', isSoundEnabled);
+        onSettingsClick();
+    };
+
+    const handleHubClick = () => {
+        playSound('click', isSoundEnabled);
+        onHubClick();
+    };
 
     return (
         <header className="fixed top-0 left-0 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-4 border-b border-gray-200 dark:border-gray-700 z-30">
@@ -35,14 +49,15 @@ const Header: React.FC<HeaderProps> = ({ userName, onSettingsClick, onHubClick, 
 
                     {showHubButton && (
                          <button
-                            onClick={onHubClick}
-                            className="bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 font-bold py-2 px-4 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/50 transition-colors"
+                            onClick={handleHubClick}
+                            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                            aria-label="Go to Hub"
                         >
-                            Hub
+                            <HomeIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
                         </button>
                     )}
                     <button
-                        onClick={onSettingsClick}
+                        onClick={handleSettingsClick}
                         className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                         aria-label={t('settings')}
                     >

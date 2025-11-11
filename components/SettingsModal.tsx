@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from '../hooks/useLocalization';
+import { playSound } from '../utils/soundUtils';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -10,20 +11,52 @@ interface SettingsModalProps {
   setFont: (font: 'default' | 'dyslexia-friendly') => void;
   language: 'en' | 'es';
   setLanguage: (language: 'en' | 'es') => void;
+  isSoundEnabled: boolean;
+  setIsSoundEnabled: (enabled: boolean) => void;
   isTeacherMode: boolean;
   setIsTeacherMode: (isTeacher: boolean) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
-  isOpen, onClose, theme, setTheme, font, setFont, language, setLanguage, isTeacherMode, setIsTeacherMode
+  isOpen, onClose, theme, setTheme, font, setFont, language, setLanguage, isSoundEnabled, setIsSoundEnabled, isTeacherMode, setIsTeacherMode
 }) => {
   const { t } = useTranslation();
+  const prevIsOpen = useRef(isOpen);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen && !prevIsOpen.current) {
+        playSound('whoosh', isSoundEnabled);
+    }
+    prevIsOpen.current = isOpen;
+  }, [isOpen, isSoundEnabled]);
+
 
   const handleTeacherModeToggle = () => {
+    playSound('click', isSoundEnabled);
     setIsTeacherMode(!isTeacherMode);
   };
+  
+  const handleSoundToggle = () => {
+    playSound('click', !isSoundEnabled); // Play sound based on future state
+    setIsSoundEnabled(!isSoundEnabled);
+  };
+
+  const handleThemeClick = (newTheme: 'light' | 'dark') => {
+    playSound('click', isSoundEnabled);
+    setTheme(newTheme);
+  };
+
+  const handleFontClick = (newFont: 'default' | 'dyslexia-friendly') => {
+    playSound('click', isSoundEnabled);
+    setFont(newFont);
+  };
+
+  const handleLanguageClick = (newLang: 'en' | 'es') => {
+    playSound('click', isSoundEnabled);
+    setLanguage(newLang);
+  };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4" onClick={onClose}>
@@ -35,25 +68,44 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           <div>
             <label className="font-bold text-gray-700 dark:text-gray-200">{t('theme')}</label>
             <div className="flex gap-2 mt-2">
-              <button onClick={() => setTheme('light')} className={`w-full py-2 rounded-lg ${theme === 'light' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('light')}</button>
-              <button onClick={() => setTheme('dark')} className={`w-full py-2 rounded-lg ${theme === 'dark' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('dark')}</button>
+              <button onClick={() => handleThemeClick('light')} className={`w-full py-2 rounded-lg ${theme === 'light' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('light')}</button>
+              <button onClick={() => handleThemeClick('dark')} className={`w-full py-2 rounded-lg ${theme === 'dark' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('dark')}</button>
             </div>
           </div>
           {/* Font Setting */}
           <div>
             <label className="font-bold text-gray-700 dark:text-gray-200">{t('font')}</label>
             <div className="flex gap-2 mt-2">
-              <button onClick={() => setFont('default')} className={`w-full py-2 rounded-lg ${font === 'default' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('default')}</button>
-              <button onClick={() => setFont('dyslexia-friendly')} className={`w-full py-2 rounded-lg ${font === 'dyslexia-friendly' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('dyslexiaFriendly')}</button>
+              <button onClick={() => handleFontClick('default')} className={`w-full py-2 rounded-lg ${font === 'default' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('default')}</button>
+              <button onClick={() => handleFontClick('dyslexia-friendly')} className={`w-full py-2 rounded-lg ${font === 'dyslexia-friendly' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('dyslexiaFriendly')}</button>
             </div>
           </div>
           {/* Language Setting */}
           <div>
             <label className="font-bold text-gray-700 dark:text-gray-200">{t('language')}</label>
             <div className="flex gap-2 mt-2">
-              <button onClick={() => setLanguage('en')} className={`w-full py-2 rounded-lg ${language === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('english')}</button>
-              <button onClick={() => setLanguage('es')} className={`w-full py-2 rounded-lg ${language === 'es' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('spanish')}</button>
+              <button onClick={() => handleLanguageClick('en')} className={`w-full py-2 rounded-lg ${language === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('english')}</button>
+              <button onClick={() => handleLanguageClick('es')} className={`w-full py-2 rounded-lg ${language === 'es' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{t('spanish')}</button>
             </div>
+          </div>
+           {/* Sound Setting */}
+           <div>
+             <label className="font-bold text-gray-700 dark:text-gray-200">Sound Effects</label>
+             <div className="flex items-center justify-between mt-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300">Enable UI sounds</p>
+                <button
+                    onClick={handleSoundToggle}
+                    className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${
+                        isSoundEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                    }`}
+                >
+                    <span
+                        className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
+                            isSoundEnabled ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                    />
+                </button>
+             </div>
           </div>
           {/* Teacher Mode Setting */}
           <div className="border-t pt-4 border-gray-200 dark:border-gray-600">

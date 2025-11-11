@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { playSound } from '../utils/soundUtils';
 
 interface OnboardingModalProps {
   isOpen: boolean;
   onNameSet: (name: string) => void;
+  isSoundEnabled: boolean;
 }
 
-const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onNameSet }) => {
+const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onNameSet, isSoundEnabled }) => {
   const [name, setName] = useState('');
+  const prevIsOpen = useRef(isOpen);
+
+  useEffect(() => {
+    if (isOpen && !prevIsOpen.current) {
+        playSound('whoosh', isSoundEnabled);
+    }
+    prevIsOpen.current = isOpen;
+  }, [isOpen, isSoundEnabled]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
+      playSound('click', isSoundEnabled);
       onNameSet(name.trim());
     }
   };

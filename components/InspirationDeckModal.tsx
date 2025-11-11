@@ -1,22 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { INSPIRATION_PROMPTS } from '../data/inspirationPrompts';
+import { playSound } from '../utils/soundUtils';
 
 interface InspirationDeckModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (prompt: string) => void;
+  isSoundEnabled: boolean;
 }
 
-const InspirationDeckModal: React.FC<InspirationDeckModalProps> = ({ isOpen, onClose, onSelect }) => {
+const InspirationDeckModal: React.FC<InspirationDeckModalProps> = ({ isOpen, onClose, onSelect, isSoundEnabled }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const prevIsOpen = useRef(isOpen);
+
+  useEffect(() => {
+    if (isOpen && !prevIsOpen.current) {
+        playSound('whoosh', isSoundEnabled);
+    }
+    prevIsOpen.current = isOpen;
+  }, [isOpen, isSoundEnabled]);
 
   if (!isOpen) return null;
 
   const handleNext = () => {
+    playSound('click', isSoundEnabled);
     setCurrentIndex((prev) => (prev + 1) % INSPIRATION_PROMPTS.length);
   };
 
   const handleSelect = () => {
+    playSound('click', isSoundEnabled);
     onSelect(INSPIRATION_PROMPTS[currentIndex].prompt);
     onClose();
   };

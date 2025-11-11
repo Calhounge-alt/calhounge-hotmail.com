@@ -1,15 +1,17 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { ETHICS_PROMPTS, EthicsPrompt, EthicsPromptCategory } from '../data/ethicsPrompts';
+import { playSound } from '../utils/soundUtils';
 
 interface EthicsPlaygroundProps {
   onBackToHub: () => void;
+  isSoundEnabled: boolean;
 }
 
 const shuffleArray = <T,>(array: T[]): T[] => {
   return [...array].sort(() => Math.random() - 0.5);
 };
 
-const EthicsPlayground: React.FC<EthicsPlaygroundProps> = ({ onBackToHub }) => {
+const EthicsPlayground: React.FC<EthicsPlaygroundProps> = ({ onBackToHub, isSoundEnabled }) => {
   const [prompts] = useState(() => shuffleArray(ETHICS_PROMPTS));
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -29,21 +31,35 @@ const EthicsPlayground: React.FC<EthicsPlaygroundProps> = ({ onBackToHub }) => {
 
     const isCorrect = draggedItem.category === category;
     if (isCorrect) {
+      playSound('success', isSoundEnabled);
       setScore((s) => s + 1);
+    } else {
+      playSound('error', isSoundEnabled);
     }
     setFeedback({ isCorrect, explanation: draggedItem.explanation });
     setDraggedItem(null);
   };
 
   const handleNextPrompt = () => {
+    playSound('click', isSoundEnabled);
     setFeedback(null);
-    setCurrentPromptIndex((i) => i + 1);
+    const nextIndex = currentPromptIndex + 1;
+    setCurrentPromptIndex(nextIndex);
+    if (nextIndex >= prompts.length) {
+        playSound('badge', isSoundEnabled);
+    }
   };
 
   const handleRestart = () => {
+    playSound('click', isSoundEnabled);
     setCurrentPromptIndex(0);
     setScore(0);
     setFeedback(null);
+  };
+  
+  const handleBackToHub = () => {
+    playSound('click', isSoundEnabled);
+    onBackToHub();
   };
 
   const DropZone: React.FC<{
@@ -84,7 +100,7 @@ const EthicsPlayground: React.FC<EthicsPlaygroundProps> = ({ onBackToHub }) => {
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
             <div
               className="bg-blue-600 h-4 rounded-full transition-all duration-500"
-              style={{ width: `${((currentPromptIndex + 1) / prompts.length) * 100}%` }}
+              style={{ width: `${((currentPromptIndex) / prompts.length) * 100}%` }}
             ></div>
           </div>
           <div className="text-center font-bold text-gray-700 dark:text-gray-200">
@@ -139,7 +155,7 @@ const EthicsPlayground: React.FC<EthicsPlaygroundProps> = ({ onBackToHub }) => {
               Play Again
             </button>
             <button
-              onClick={onBackToHub}
+              onClick={handleBackToHub}
               className="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700"
             >
               Back to Hub
@@ -164,7 +180,7 @@ const EthicsPlayground: React.FC<EthicsPlaygroundProps> = ({ onBackToHub }) => {
               onClick={handleNextPrompt}
               className="mt-8 w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700"
             >
-              Next Prompt
+              {isComplete ? 'See Results' : 'Next Prompt'}
             </button>
           </div>
         </div>

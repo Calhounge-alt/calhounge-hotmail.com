@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { generateSpeech } from '../services/geminiService';
 import { decode, decodeAudioData } from '../utils/audioUtils';
+import { playSound } from '../utils/soundUtils';
 import { PlayIcon, PauseIcon, StopIcon } from './Icons';
 
 interface LearnScreenProps {
   onBack: () => void;
+  isSoundEnabled: boolean;
 }
 
 const learnContent = [
@@ -51,7 +53,8 @@ const AccordionItem = ({
     narrationStatus, 
     onNarrateClick, 
     onPlayPauseClick, 
-    onStopClick 
+    onStopClick,
+    isSoundEnabled,
 }: { 
     icon: string, 
     title: string, 
@@ -61,64 +64,80 @@ const AccordionItem = ({
     narrationStatus: NarrationStatus,
     onNarrateClick: () => void,
     onPlayPauseClick: () => void,
-    onStopClick: () => void
-}) => (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-        <button
-            onClick={onClick}
-            className="w-full flex justify-between items-center p-4 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
-        >
-            <div className="flex items-center gap-3">
-                <span className="text-2xl">{icon}</span>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 text-left">{title}</h3>
-            </div>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={`h-6 w-6 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+    onStopClick: () => void,
+    isSoundEnabled: boolean,
+}) => {
+    const handleNarrate = () => {
+        playSound('click', isSoundEnabled);
+        onNarrateClick();
+    };
+    const handlePlayPause = () => {
+        playSound('click', isSoundEnabled);
+        onPlayPauseClick();
+    };
+    const handleStop = () => {
+        playSound('click', isSoundEnabled);
+        onStopClick();
+    };
+
+    return (
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+            <button
+                onClick={onClick}
+                className="w-full flex justify-between items-center p-4 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
             >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-        </button>
-        <div
-            className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-screen' : 'max-h-0'}`}
-        >
-            <div className="p-4 bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300">
-                <p>{content}</p>
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    {narrationStatus === 'loading' && (
-                         <div className="flex items-center gap-2 text-gray-500">
-                            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            <span>Generating audio...</span>
-                         </div>
-                    )}
-                    {narrationStatus === 'idle' && (
-                         <button onClick={onNarrateClick} className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
-                            Read Aloud
-                         </button>
-                    )}
-                    {(narrationStatus === 'playing' || narrationStatus === 'paused') && (
-                        <div className="flex items-center gap-2">
-                            <button onClick={onPlayPauseClick} className="flex items-center gap-2 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 font-semibold py-2 px-4 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/50 transition-colors" aria-label={narrationStatus === 'playing' ? 'Pause read-aloud' : 'Play read-aloud'}>
-                                {narrationStatus === 'playing' ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
-                                <span>{narrationStatus === 'playing' ? 'Pause' : 'Resume'}</span>
+                <div className="flex items-center gap-3">
+                    <span className="text-2xl">{icon}</span>
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 text-left">{title}</h3>
+                </div>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`h-6 w-6 transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            <div
+                className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-screen' : 'max-h-0'}`}
+            >
+                <div className="p-4 bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300">
+                    <p>{content}</p>
+                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        {narrationStatus === 'loading' && (
+                            <div className="flex items-center gap-2 text-gray-500">
+                                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                <span>Generating audio...</span>
+                            </div>
+                        )}
+                        {narrationStatus === 'idle' && (
+                            <button onClick={handleNarrate} className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+                                Read Aloud
                             </button>
-                            <button onClick={onStopClick} className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Stop read-aloud">
-                                <StopIcon className="h-5 w-5" />
-                                <span>Stop</span>
-                            </button>
-                        </div>
-                    )}
-                 </div>
+                        )}
+                        {(narrationStatus === 'playing' || narrationStatus === 'paused') && (
+                            <div className="flex items-center gap-2">
+                                <button onClick={handlePlayPause} className="flex items-center gap-2 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 font-semibold py-2 px-4 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/50 transition-colors" aria-label={narrationStatus === 'playing' ? 'Pause read-aloud' : 'Play read-aloud'}>
+                                    {narrationStatus === 'playing' ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
+                                    <span>{narrationStatus === 'playing' ? 'Pause' : 'Resume'}</span>
+                                </button>
+                                <button onClick={handleStop} className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold py-2 px-4 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Stop read-aloud">
+                                    <StopIcon className="h-5 w-5" />
+                                    <span>Stop</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 
-const LearnScreen: React.FC<LearnScreenProps> = ({ onBack }) => {
+const LearnScreen: React.FC<LearnScreenProps> = ({ onBack, isSoundEnabled }) => {
     const [openItemIndex, setOpenItemIndex] = useState<number | null>(null);
     const [narrationState, setNarrationState] = useState<{ index: number; status: NarrationStatus }>({ index: -1, status: 'idle' });
     
@@ -222,7 +241,13 @@ const LearnScreen: React.FC<LearnScreenProps> = ({ onBack }) => {
     };
 
     const handleItemClick = (index: number) => {
+        playSound('click', isSoundEnabled);
         setOpenItemIndex(openItemIndex === index ? null : index);
+    };
+
+    const handleBackClick = () => {
+        playSound('click', isSoundEnabled);
+        onBack();
     };
 
   return (
@@ -245,13 +270,14 @@ const LearnScreen: React.FC<LearnScreenProps> = ({ onBack }) => {
                 onNarrateClick={() => handleNarrate(index, item.content)}
                 onPlayPauseClick={handlePlayPause}
                 onStopClick={handleStop}
+                isSoundEnabled={isSoundEnabled}
             />
         ))}
       </div>
 
       <div className="text-center">
         <button 
-            onClick={onBack}
+            onClick={handleBackClick}
             className="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-blue-700 transition-all transform hover:scale-105"
         >
             Back to Workshop

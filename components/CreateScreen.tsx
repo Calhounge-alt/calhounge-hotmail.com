@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ArtStyle, Vibe, VoiceName, Character, ProgressStep } from '../types';
 import { explainPrompt, generateStory, generateImage, generateSpeech } from '../services/geminiService';
 import { decode, decodeAudioData } from '../utils/audioUtils';
+import { playSound } from '../utils/soundUtils';
 import VibeSelector from './VibeSelector';
 import VoiceSelector from './VoiceSelector';
 import CharacterCustomizer from './CharacterCustomizer';
@@ -17,9 +18,10 @@ import CreativityMeterModal from './CreativityMeterModal';
 interface CreateScreenProps {
   onBackToHub: () => void;
   onSubmitToGallery: (creation: { storyText: string; imageUrl: string }) => void;
+  isSoundEnabled: boolean;
 }
 
-const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGallery }) => {
+const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGallery, isSoundEnabled }) => {
   const [prompt, setPrompt] = useState('');
   const [explainedPrompt, setExplainedPrompt] = useState('');
   const [story, setStory] = useState('');
@@ -76,6 +78,7 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
 
   const handleExplainPrompt = async () => {
     if (!prompt) return;
+    playSound('click', isSoundEnabled);
     setLoading('explain', true);
     const explanation = await explainPrompt(prompt);
     setExplainedPrompt(explanation);
@@ -84,27 +87,34 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
 
   const handleGenerateStory = async () => {
     if (!prompt) return;
+    playSound('click', isSoundEnabled);
     setLoading('story', true);
     setStory('');
     const fullPrompt = `${prompt}${characterPrompt()}`;
     const newStory = await generateStory(fullPrompt, selectedVibe || undefined);
     setStory(newStory);
     setLoading('story', false);
+    playSound('success', isSoundEnabled);
     setIsCreativityMeterOpen(true);
   };
 
   const handleGenerateImage = async () => {
     if (!story && !prompt) return;
+    playSound('click', isSoundEnabled);
     setLoading('image', true);
     setImageUrl('');
     const imagePrompt = story || prompt;
     const result = await generateImage(imagePrompt, selectedArtStyle, uploadedImage || undefined);
-    if (result) setImageUrl(result);
+    if (result) {
+        setImageUrl(result);
+        playSound('success', isSoundEnabled);
+    }
     setLoading('image', false);
   };
 
   const handleGenerateAudio = async () => {
     if (!story) return;
+    playSound('click', isSoundEnabled);
     setLoading('audio', true);
     setAudioUrl('');
     const base64Audio = await generateSpeech(story, selectedVoice);
@@ -113,6 +123,7 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
       const audioBlob = new Blob([audioBytes], { type: 'audio/webm' }); // Use a standard type
       const url = URL.createObjectURL(audioBlob);
       setAudioUrl(url);
+      playSound('success', isSoundEnabled);
     }
     setLoading('audio', false);
   };
@@ -148,6 +159,7 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
   };
 
   const toggleNarration = () => {
+    playSound('click', isSoundEnabled);
     if (audioRef.current) {
         if(isNarrationPlaying) {
             audioRef.current.pause();
@@ -159,6 +171,7 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
   };
 
   const toggleMusic = () => {
+    playSound('click', isSoundEnabled);
     if (musicRef.current) {
         if(isMusicPlaying) {
             musicRef.current.pause();
@@ -176,12 +189,17 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
     }
   };
 
+  const handleArtStyleClick = (style: ArtStyle) => {
+    playSound('click', isSoundEnabled);
+    setSelectedArtStyle(style);
+  }
+
   return (
     <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 py-8 px-4">
       <ProgressHUD completedSteps={completedSteps} imaginationPower={imaginationPower}/>
-      <CreativityMeterModal isOpen={isCreativityMeterOpen} onClose={() => setIsCreativityMeterOpen(false)} />
-      <InspirationDeckModal isOpen={isInspirationOpen} onClose={() => setIsInspirationOpen(false)} onSelect={p => setPrompt(p)} />
-      <SubmissionModal isOpen={isSubmissionOpen} onClose={() => setIsSubmissionOpen(false)} onConfirm={handleSubmission} />
+      <CreativityMeterModal isOpen={isCreativityMeterOpen} onClose={() => setIsCreativityMeterOpen(false)} isSoundEnabled={isSoundEnabled} />
+      <InspirationDeckModal isOpen={isInspirationOpen} onClose={() => setIsInspirationOpen(false)} onSelect={p => setPrompt(p)} isSoundEnabled={isSoundEnabled} />
+      <SubmissionModal isOpen={isSubmissionOpen} onClose={() => setIsSubmissionOpen(false)} onConfirm={handleSubmission} isSoundEnabled={isSoundEnabled} />
 
       {/* Left Column: Controls */}
       <div className="lg:col-span-1 space-y-6">
@@ -199,7 +217,7 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
             <button onClick={handleExplainPrompt} disabled={isLoading.explain || !prompt} className="w-full bg-gray-200 dark:bg-gray-600 text-sm font-bold py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">
               {isLoading.explain ? 'Thinking...' : 'AI-dea Boost'}
             </button>
-            <button onClick={() => setIsInspirationOpen(true)} className="w-full bg-yellow-400 text-yellow-900 text-sm font-bold py-2 rounded-lg hover:bg-yellow-500">
+            <button onClick={() => { playSound('click', isSoundEnabled); setIsInspirationOpen(true); }} className="w-full bg-yellow-400 text-yellow-900 text-sm font-bold py-2 rounded-lg hover:bg-yellow-500">
               Get Inspired
             </button>
           </div>
@@ -208,12 +226,13 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
         
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
           <h3 className="text-xl font-bold text-gray-700 dark:text-gray-100">2. Customize Character (Optional)</h3>
-          <CharacterCustomizer character={character} onCharacterChange={setCharacter} />
+          <CharacterCustomizer character={character} onCharacterChange={setCharacter} isSoundEnabled={isSoundEnabled} />
         </div>
 
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
           <h3 className="text-xl font-bold text-gray-700 dark:text-gray-100">3. Set the Vibe</h3>
-          <VibeSelector selectedVibe={selectedVibe} onVibeChange={setSelectedVibe} />
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Choose a feeling for your story. This will help the AI write in the right tone!</p>
+          <VibeSelector selectedVibe={selectedVibe} onVibeChange={setSelectedVibe} isSoundEnabled={isSoundEnabled} />
         </div>
         
         <button onClick={handleGenerateStory} disabled={isLoading.story || !prompt} className="w-full bg-blue-600 text-white font-bold py-4 rounded-lg text-lg hover:bg-blue-700 disabled:bg-gray-400 dark:disabled:bg-gray-500 transition-transform transform hover:scale-105">
@@ -236,11 +255,11 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
           <h3 className="text-xl font-bold text-gray-700 dark:text-gray-100">5. Create an Illustration</h3>
           <div className="flex flex-wrap gap-2">
             {(['cartoon', 'watercolor', 'pixel_art', 'realistic', 'comic_book', 'afrofuturism', 'collage'] as ArtStyle[]).map(style => (
-              <button key={style} onClick={() => setSelectedArtStyle(style)} className={`px-3 py-1 text-sm font-semibold rounded-full ${selectedArtStyle === style ? 'bg-purple-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{style.replace('_', ' ')}</button>
+              <button key={style} onClick={() => handleArtStyleClick(style)} className={`px-3 py-1 text-sm font-semibold rounded-full ${selectedArtStyle === style ? 'bg-purple-600 text-white' : 'bg-gray-200 dark:bg-gray-600'}`}>{style.replace('_', ' ')}</button>
             ))}
           </div>
           <div className="flex gap-2">
-            <button onClick={() => fileInputRef.current?.click()} className="w-full bg-gray-200 dark:bg-gray-600 font-bold py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">
+            <button onClick={() => { playSound('click', isSoundEnabled); fileInputRef.current?.click(); }} className="w-full bg-gray-200 dark:bg-gray-600 font-bold py-3 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">
               {uploadedImage ? 'Image Uploaded!' : 'Upload Image'}
             </button>
             <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
@@ -257,7 +276,7 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
 
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg space-y-4">
           <h3 className="text-xl font-bold text-gray-700 dark:text-gray-100">6. Narrate Your Story</h3>
-          <VoiceSelector selectedVoice={selectedVoice} onVoiceChange={setSelectedVoice} />
+          <VoiceSelector selectedVoice={selectedVoice} onVoiceChange={setSelectedVoice} isSoundEnabled={isSoundEnabled} />
           <button onClick={handleGenerateAudio} disabled={isLoading.audio || !story} className="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 dark:disabled:bg-gray-500">
             {isLoading.audio ? 'Recording...' : 'Generate Narration'}
           </button>
@@ -272,7 +291,7 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
           )}
         </div>
         
-        {story && <MusicCreator story={story} onMusicGenerated={url => setMusicUrl(url)} />}
+        {story && <MusicCreator story={story} onMusicGenerated={url => setMusicUrl(url)} isSoundEnabled={isSoundEnabled} />}
 
         {musicUrl && (
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex items-center gap-4">
@@ -293,12 +312,12 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
         </div>
 
         <div className="flex gap-4">
-          <button onClick={onBackToHub} className="w-full bg-gray-500 text-white font-bold py-4 rounded-lg text-lg hover:bg-gray-600">
+          <button onClick={() => { playSound('click', isSoundEnabled); onBackToHub(); }} className="w-full bg-gray-500 text-white font-bold py-4 rounded-lg text-lg hover:bg-gray-600">
             Back to Hub
           </button>
           {story && imageUrl ? (
             <button 
-              onClick={() => setIsSubmissionOpen(true)} 
+              onClick={() => { playSound('click', isSoundEnabled); setIsSubmissionOpen(true); }}
               className="w-full bg-yellow-500 text-white font-bold py-4 rounded-lg text-lg hover:bg-yellow-600 animate-fade-in-up"
             >
               Submit to GTC Gallery

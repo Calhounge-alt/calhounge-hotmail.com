@@ -2,15 +2,27 @@ import React, { useState } from 'react';
 import { GTC_WORLD_CHANGERS_STORIES } from '../data/gtcWorldChangers';
 import { GTC_CATEGORIES, GTC_CategoryKey } from '../types';
 import GTCStoryCard from './GTCStoryCard';
+import { playSound } from '../utils/soundUtils';
 
 interface GTCGalleryScreenProps {
   onBackToHub: () => void;
+  isSoundEnabled: boolean;
 }
 
-const GTCGalleryScreen: React.FC<GTCGalleryScreenProps> = ({ onBackToHub }) => {
+const GTCGalleryScreen: React.FC<GTCGalleryScreenProps> = ({ onBackToHub, isSoundEnabled }) => {
   const [activeTab, setActiveTab] = useState<GTC_CategoryKey>('story');
 
   const filteredStories = GTC_WORLD_CHANGERS_STORIES.filter(story => story.category === activeTab);
+
+  const handleTabClick = (key: GTC_CategoryKey) => {
+    playSound('click', isSoundEnabled);
+    setActiveTab(key);
+  };
+  
+  const handleBackClick = () => {
+    playSound('click', isSoundEnabled);
+    onBackToHub();
+  };
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-fade-in-up">
@@ -28,7 +40,7 @@ const GTCGalleryScreen: React.FC<GTCGalleryScreenProps> = ({ onBackToHub }) => {
           {Object.keys(GTC_CATEGORIES).map((key) => (
             <button
               key={key}
-              onClick={() => setActiveTab(key as GTC_CategoryKey)}
+              onClick={() => handleTabClick(key as GTC_CategoryKey)}
               className={`px-4 py-2 text-sm sm:text-base font-bold rounded-lg transition-colors ${
                 activeTab === key
                   ? 'bg-blue-600 text-white'
@@ -60,7 +72,7 @@ const GTCGalleryScreen: React.FC<GTCGalleryScreenProps> = ({ onBackToHub }) => {
 
       <div className="text-center">
         <button 
-            onClick={onBackToHub}
+            onClick={handleBackClick}
             className="bg-gray-600 text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-700 transition-all transform hover:scale-105"
         >
             Back to Hub

@@ -1,14 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../hooks/useLocalization';
+import { playSound } from '../utils/soundUtils';
 
 interface CreativityMeterModalProps {
   isOpen: boolean;
   onClose: () => void;
+  isSoundEnabled: boolean;
 }
 
-const CreativityMeterModal: React.FC<CreativityMeterModalProps> = ({ isOpen, onClose }) => {
+const CreativityMeterModal: React.FC<CreativityMeterModalProps> = ({ isOpen, onClose, isSoundEnabled }) => {
   const [value, setValue] = useState(50);
   const { t } = useTranslation();
+  const prevIsOpen = useRef(isOpen);
+
+  useEffect(() => {
+    if (isOpen && !prevIsOpen.current) {
+        playSound('whoosh', isSoundEnabled);
+    }
+    prevIsOpen.current = isOpen;
+  }, [isOpen, isSoundEnabled]);
+
 
   if (!isOpen) return null;
 
@@ -16,8 +27,13 @@ const CreativityMeterModal: React.FC<CreativityMeterModalProps> = ({ isOpen, onC
     setValue(Number(e.target.value));
   };
 
+  const handleClose = () => {
+    playSound('click', isSoundEnabled);
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 transition-opacity duration-300" onClick={onClose}>
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 transition-opacity duration-300" onClick={handleClose}>
       <div 
         className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md w-full text-center transform transition-all animate-fade-in-up" 
         onClick={(e) => e.stopPropagation()}
@@ -61,7 +77,7 @@ const CreativityMeterModal: React.FC<CreativityMeterModalProps> = ({ isOpen, onC
         </p>
         
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="mt-6 w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-blue-700 transition-transform transform hover:scale-105"
         >
           {t('gotIt')}

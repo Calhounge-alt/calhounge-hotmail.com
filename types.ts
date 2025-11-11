@@ -157,3 +157,6 @@ export interface AvatarState {
   accessory: ShopItem | null;
   background: ShopItem | null;
 }
+
+// For sound effects
+export type SoundEffect = 'click' | 'success' | 'whoosh' | 'badge' | 'purchase' | 'error';

@@ -35,6 +35,7 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>(localStorage.getItem('theme') as any || 'light');
   const [font, setFont] = useState<'default' | 'dyslexia-friendly'>(localStorage.getItem('font') as any || 'default');
   const [language, setLanguage] = useState<'en' | 'es'>(localStorage.getItem('language') as any || 'en');
+  const [isSoundEnabled, setIsSoundEnabled] = useState(localStorage.getItem('isSoundEnabled') === 'true' || localStorage.getItem('isSoundEnabled') === null);
   const [isTeacherMode, setIsTeacherMode] = useState(false);
   
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -59,6 +60,10 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('language', language);
   }, [language]);
+  
+  useEffect(() => {
+    localStorage.setItem('isSoundEnabled', isSoundEnabled.toString());
+  }, [isSoundEnabled]);
 
   const handleNameSet = (name: string) => {
     setUserName(name);
@@ -157,23 +162,23 @@ const App: React.FC = () => {
         case 'welcome': return <WelcomeScreen onNameSet={handleNameSet} />;
         case 'lesson': return <MiniLesson setNextDisabled={setNextDisabled} />;
         case 'demo': return <LiveDemo setNextDisabled={setNextDisabled} />;
-        case 'practice': return <PromptPractice setNextDisabled={setNextDisabled} />;
-        case 'rewards': return <RewardsScreen userName={userName!} setNextDisabled={setNextDisabled} />;
+        case 'practice': return <PromptPractice setNextDisabled={setNextDisabled} isSoundEnabled={isSoundEnabled} />;
+        case 'rewards': return <RewardsScreen userName={userName!} setNextDisabled={setNextDisabled} isSoundEnabled={isSoundEnabled} />;
         default: return null;
       }
     } else {
        if (isTeacherMode) return <TeacherControlPanel />;
        
        switch (currentScreen) {
-        case 'hub': return <HubScreen userName={userName!} onNavigate={navigateToScreen} />;
-        case 'create': return <CreateScreen onBackToHub={() => setCurrentScreen('hub')} onSubmitToGallery={handleSubmitToGallery} />;
-        case 'learn': return <LearnScreen onBack={() => setCurrentScreen('hub')} />;
-        case 'storyHub': return <StoryHubScreen stories={communityStories} onReaction={handleReaction} />;
-        case 'ethics': return <EthicsPlayground onBackToHub={() => setCurrentScreen('hub')} />;
-        case 'freedomFighters': return <FreedomFightersZone onBackToHub={() => setCurrentScreen('hub')} onNavigateToCreate={() => setCurrentScreen('create')} />;
-        case 'shop': return <ShopScreen onBackToHub={() => setCurrentScreen('hub')} avatarState={avatarState} coins={coins} onPurchase={handlePurchase} onEquip={handleEquip} purchasedItems={purchasedItems} />;
-        case 'gtcGallery': return <GTCGalleryScreen onBackToHub={() => setCurrentScreen('hub')} />;
-        default: return <HubScreen userName={userName!} onNavigate={navigateToScreen} />;
+        case 'hub': return <HubScreen userName={userName!} onNavigate={navigateToScreen} isSoundEnabled={isSoundEnabled} />;
+        case 'create': return <CreateScreen onBackToHub={() => setCurrentScreen('hub')} onSubmitToGallery={handleSubmitToGallery} isSoundEnabled={isSoundEnabled} />;
+        case 'learn': return <LearnScreen onBack={() => setCurrentScreen('hub')} isSoundEnabled={isSoundEnabled} />;
+        case 'storyHub': return <StoryHubScreen stories={communityStories} onReaction={handleReaction} onNavigateToCreate={() => navigateToScreen('create')} isSoundEnabled={isSoundEnabled} />;
+        case 'ethics': return <EthicsPlayground onBackToHub={() => setCurrentScreen('hub')} isSoundEnabled={isSoundEnabled} />;
+        case 'freedomFighters': return <FreedomFightersZone onBackToHub={() => setCurrentScreen('hub')} onNavigateToCreate={() => setCurrentScreen('create')} isSoundEnabled={isSoundEnabled} />;
+        case 'shop': return <ShopScreen onBackToHub={() => setCurrentScreen('hub')} avatarState={avatarState} coins={coins} onPurchase={handlePurchase} onEquip={handleEquip} purchasedItems={purchasedItems} isSoundEnabled={isSoundEnabled} />;
+        case 'gtcGallery': return <GTCGalleryScreen onBackToHub={() => setCurrentScreen('hub')} isSoundEnabled={isSoundEnabled} />;
+        default: return <HubScreen userName={userName!} onNavigate={navigateToScreen} isSoundEnabled={isSoundEnabled} />;
        }
     }
   };
@@ -187,17 +192,18 @@ const App: React.FC = () => {
                 userName={userName || 'Creator'}
                 onSettingsClick={() => setIsSettingsOpen(true)}
                 onHubClick={() => navigateToScreen('hub')}
-                showHubButton={appStep === 'hub' && currentScreen !== 'hub'}
+                showHubButton={!(appStep === 'hub' && currentScreen === 'hub')}
                 avatarState={avatarState}
                 coins={coins}
+                isSoundEnabled={isSoundEnabled}
             />
             <main className="pt-24 pb-28 px-4">
                 {renderContent()}
             </main>
             
-            {showNav && <GlobalNav onBack={handleBack} onNext={handleNext} showBack={appStep !== 'lesson'} showNext={appStep !== 'rewards'} isNextDisabled={isNextDisabled} />}
+            {showNav && <GlobalNav onBack={handleBack} onNext={handleNext} showBack={appStep !== 'lesson'} showNext={appStep !== 'rewards'} isNextDisabled={isNextDisabled} isSoundEnabled={isSoundEnabled} />}
             
-            <OnboardingModal isOpen={appStep === 'welcome' && !userName} onNameSet={handleNameSet} />
+            <OnboardingModal isOpen={appStep === 'welcome' && !userName} onNameSet={handleNameSet} isSoundEnabled={isSoundEnabled} />
 
             <SettingsModal 
                 isOpen={isSettingsOpen}
@@ -208,6 +214,8 @@ const App: React.FC = () => {
                 setFont={setFont}
                 language={language}
                 setLanguage={setLanguage}
+                isSoundEnabled={isSoundEnabled}
+                setIsSoundEnabled={setIsSoundEnabled}
                 isTeacherMode={isTeacherMode}
                 setIsTeacherMode={setIsTeacherMode}
             />

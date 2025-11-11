@@ -5,12 +5,8 @@ import { PromptAnalysis, ArtStyle, Vibe, VoiceName, MusicStyle, CustomMusicParam
 
 const API_KEY = process.env.API_KEY;
 
-if (!API_KEY) {
-  // Use console.warn to avoid crashing the app if the key is missing during development.
-  // The app should handle the missing key gracefully.
-  console.warn("API_KEY not found in environment variables.");
-}
-
+// Initialize the GoogleGenAI client.
+// The API_KEY is required and is expected to be in the deployment environment.
 const ai = new GoogleGenAI({ apiKey: API_KEY! });
 
 export const explainPrompt = async (prompt: string): Promise<string> => {
@@ -210,8 +206,6 @@ interface MusicGenerationConfig {
 
 export const generateMusic = async (story: string, config: MusicGenerationConfig): Promise<string | null> => {
     // This is a simulated function. In a real application, this would call a music generation API.
-    console.log("Simulating music generation for story:", story, "with config:", config);
-
     return new Promise(resolve => {
         setTimeout(() => {
             let trackUrl = musicDatabase.default; // Fallback track
@@ -221,7 +215,6 @@ export const generateMusic = async (story: string, config: MusicGenerationConfig
                 // Prioritize emotion for track selection in this simulation
                 trackUrl = musicDatabase[config.custom.emotion] || musicDatabase.default;
             }
-            console.log("Generated music URL:", trackUrl);
             resolve(trackUrl);
         }, 3000); // Simulate a 3-second API call
     });

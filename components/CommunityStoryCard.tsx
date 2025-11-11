@@ -3,11 +3,13 @@ import { CommunityStory, ReactionType } from '../types';
 import { LightbulbIcon, PaletteIcon, ThoughtBubbleIcon, PlayIcon, PauseIcon, StopIcon } from './Icons';
 import { generateSpeech } from '../services/geminiService';
 import { decode, decodeAudioData } from '../utils/audioUtils';
+import { playSound } from '../utils/soundUtils';
 
 interface CommunityStoryCardProps {
     story: CommunityStory;
     onReaction: (storyId: number, reactionType: ReactionType) => void;
     hasReacted: boolean;
+    isSoundEnabled: boolean;
 }
 
 type NarrationState = 'idle' | 'playing' | 'paused';
@@ -30,7 +32,7 @@ const ReactionButton: React.FC<{
     </button>
 );
 
-const CommunityStoryCard: React.FC<CommunityStoryCardProps> = ({ story, onReaction, hasReacted }) => {
+const CommunityStoryCard: React.FC<CommunityStoryCardProps> = ({ story, onReaction, hasReacted, isSoundEnabled }) => {
     const [isNarrationLoading, setIsNarrationLoading] = useState(false);
     const [narrationState, setNarrationState] = useState<NarrationState>('idle');
     const audioContextRef = useRef<AudioContext | null>(null);
@@ -62,6 +64,7 @@ const CommunityStoryCard: React.FC<CommunityStoryCardProps> = ({ story, onReacti
     };
 
     const handlePlayPause = () => {
+        playSound('click', isSoundEnabled);
         if (!audioContextRef.current) return;
         if (narrationState === 'playing') {
           audioContextRef.current.suspend();
@@ -75,18 +78,21 @@ const CommunityStoryCard: React.FC<CommunityStoryCardProps> = ({ story, onReacti
     };
 
     const handleStop = () => {
+        playSound('click', isSoundEnabled);
         if (audioSourceRef.current) {
           audioSourceRef.current.stop();
         }
     };
 
     const handleNarrateStory = async () => {
+        playSound('click', isSoundEnabled);
         if (!story.storyText || isNarrationLoading || audioBufferRef.current) return;
         setIsNarrationLoading(true);
         const base64Audio = await generateSpeech(story.storyText);
         setIsNarrationLoading(false);
         if (base64Audio) {
           try {
+            playSound('success', isSoundEnabled);
             if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
               audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
             }
@@ -99,6 +105,7 @@ const CommunityStoryCard: React.FC<CommunityStoryCardProps> = ({ story, onReacti
             alert("Sorry, an error occurred while trying to play the audio.");
           }
         } else {
+          playSound('error', isSoundEnabled);
           alert("Sorry, we couldn't generate audio for this story right now.");
         }
     };

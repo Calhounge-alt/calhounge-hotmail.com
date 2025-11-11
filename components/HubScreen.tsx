@@ -1,9 +1,11 @@
 import React from 'react';
 import { useTranslation } from '../hooks/useLocalization';
+import { playSound } from '../utils/soundUtils';
 
 interface HubScreenProps {
   userName: string;
   onNavigate: (screen: string) => void;
+  isSoundEnabled: boolean;
 }
 
 const HubCard: React.FC<{
@@ -12,19 +14,27 @@ const HubCard: React.FC<{
   description: string;
   onClick: () => void;
   color: string;
-}> = ({ icon, title, description, onClick, color }) => (
-  <button
-    onClick={onClick}
-    className={`bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-left w-full h-full flex flex-col transition-all duration-300 transform hover:scale-105 hover:shadow-2xl border-t-4 ${color}`}
-  >
-    <div className="text-4xl mb-3">{icon}</div>
-    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{title}</h3>
-    <p className="text-gray-600 dark:text-gray-400 mt-2 flex-grow">{description}</p>
-  </button>
-);
+  isSoundEnabled: boolean;
+}> = ({ icon, title, description, onClick, color, isSoundEnabled }) => {
+    const handleClick = () => {
+        playSound('click', isSoundEnabled);
+        onClick();
+    };
+
+    return (
+        <button
+            onClick={handleClick}
+            className={`bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-left w-full h-full flex flex-col transition-all duration-300 transform hover:scale-105 hover:shadow-2xl border-t-4 ${color}`}
+        >
+            <div className="text-4xl mb-3">{icon}</div>
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{title}</h3>
+            <p className="text-gray-600 dark:text-gray-400 mt-2 flex-grow">{description}</p>
+        </button>
+    );
+};
 
 
-const HubScreen: React.FC<HubScreenProps> = ({ userName, onNavigate }) => {
+const HubScreen: React.FC<HubScreenProps> = ({ userName, onNavigate, isSoundEnabled }) => {
   const { t } = useTranslation();
 
   return (
@@ -43,6 +53,7 @@ const HubScreen: React.FC<HubScreenProps> = ({ userName, onNavigate }) => {
           description="Bring a new story to life with your AI sidekick. Write, illustrate, and add music!"
           onClick={() => onNavigate('create')}
           color="border-blue-500"
+          isSoundEnabled={isSoundEnabled}
         />
         <HubCard
           icon="📚"
@@ -50,6 +61,7 @@ const HubScreen: React.FC<HubScreenProps> = ({ userName, onNavigate }) => {
           description="Explore mini-lessons about AI, digital safety, and the history of creativity."
           onClick={() => onNavigate('learn')}
           color="border-green-500"
+          isSoundEnabled={isSoundEnabled}
         />
         <HubCard
           icon="🖼️"
@@ -57,6 +69,7 @@ const HubScreen: React.FC<HubScreenProps> = ({ userName, onNavigate }) => {
           description="See what other young creators have made and get inspired by their stories."
           onClick={() => onNavigate('storyHub')}
           color="border-purple-500"
+          isSoundEnabled={isSoundEnabled}
         />
         <HubCard
           icon="🛡️"
@@ -64,6 +77,7 @@ const HubScreen: React.FC<HubScreenProps> = ({ userName, onNavigate }) => {
           description="Play a game to learn how to use AI responsibly and make good choices online."
           onClick={() => onNavigate('ethics')}
           color="border-yellow-500"
+          isSoundEnabled={isSoundEnabled}
         />
         <HubCard
           icon="🛒"
@@ -71,6 +85,7 @@ const HubScreen: React.FC<HubScreenProps> = ({ userName, onNavigate }) => {
           description="Spend your coins to customize your profile and AI sidekick with fun accessories."
           onClick={() => onNavigate('shop')}
           color="border-pink-500"
+          isSoundEnabled={isSoundEnabled}
         />
         <HubCard
           icon="🦸"
@@ -78,6 +93,7 @@ const HubScreen: React.FC<HubScreenProps> = ({ userName, onNavigate }) => {
           description="Join Joshua, Ruby, and Benjamin and learn to use AI as a force for good!"
           onClick={() => onNavigate('freedomFighters')}
           color="border-red-500"
+          isSoundEnabled={isSoundEnabled}
         />
       </div>
       <div className="text-center text-gray-500 text-sm">
