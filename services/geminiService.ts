@@ -1,15 +1,22 @@
-
-
 import { GoogleGenAI, Modality, Type } from "@google/genai";
 import { PromptAnalysis, ArtStyle, Vibe, VoiceName, MusicStyle, CustomMusicParams } from "../types";
 
-const API_KEY = process.env.API_KEY;
+let ai: GoogleGenAI | null = null;
 
-// Initialize the GoogleGenAI client.
-// The API_KEY is required and is expected to be in the deployment environment.
-const ai = new GoogleGenAI({ apiKey: API_KEY! });
+export const initializeAiClient = (apiKey: string) => {
+  ai = new GoogleGenAI({ apiKey });
+};
+
+export const isAiClientInitialized = (): boolean => {
+  return !!ai;
+};
+
 
 export const explainPrompt = async (prompt: string): Promise<string> => {
+  if (!ai) {
+    console.error("AI client not initialized.");
+    return "Error: AI client is not initialized. Please set your API key in settings.";
+  }
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
@@ -28,6 +35,10 @@ export const explainPrompt = async (prompt: string): Promise<string> => {
 };
 
 export const generateStory = async (prompt: string, vibe?: Vibe): Promise<string> => {
+  if (!ai) {
+    console.error("AI client not initialized.");
+    return "Oops! Our storyteller seems to be taking a nap because an API key hasn't been set. Please add one in the settings menu (top right).";
+  }
   try {
     const vibePrompts: Record<Vibe, string> = {
         joyful: 'Write in a joyful, lighthearted, and optimistic tone.',
@@ -61,6 +72,10 @@ export const generateImage = async (
   artStyle: ArtStyle, 
   uploadedImage?: {data: string, mimeType: string}
 ): Promise<string | null> => {
+  if (!ai) {
+    console.error("AI client not initialized.");
+    return null;
+  }
   try {
     const stylePrompts: Record<ArtStyle, string> = {
       cartoon: 'in a vibrant, colorful, and kid-friendly illustration in a modern cartoon style',
@@ -113,6 +128,10 @@ export const generateImage = async (
 
 
 export const analyzePrompt = async (prompt: string): Promise<PromptAnalysis | null> => {
+    if (!ai) {
+      console.error("AI client not initialized.");
+      return null;
+    }
     try {
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
@@ -159,6 +178,10 @@ export const analyzePrompt = async (prompt: string): Promise<PromptAnalysis | nu
 };
 
 export const generateSpeech = async (text: string, voiceName: VoiceName = 'Ruby'): Promise<string | null> => {
+  if (!ai) {
+    console.error("AI client not initialized.");
+    return null;
+  }
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-preview-tts",

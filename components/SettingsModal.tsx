@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../hooks/useLocalization';
+import { useApiKey } from '../hooks/useApiKey';
 import { playSound } from '../utils/soundUtils';
 
 interface SettingsModalProps {
@@ -21,6 +22,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen, onClose, theme, setTheme, font, setFont, language, setLanguage, isSoundEnabled, setIsSoundEnabled, isTeacherMode, setIsTeacherMode
 }) => {
   const { t } = useTranslation();
+  const { apiKey, setApiKey } = useApiKey();
+  const [localApiKey, setLocalApiKey] = useState(apiKey || '');
+  const [keySaved, setKeySaved] = useState(false);
   const prevIsOpen = useRef(isOpen);
 
   useEffect(() => {
@@ -28,7 +32,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         playSound('whoosh', isSoundEnabled);
     }
     prevIsOpen.current = isOpen;
-  }, [isOpen, isSoundEnabled]);
+    // Reset local key state when modal opens
+    if (isOpen) {
+        setLocalApiKey(apiKey || '');
+        setKeySaved(false);
+    }
+  }, [isOpen, isSoundEnabled, apiKey]);
 
 
   const handleTeacherModeToggle = () => {
@@ -55,6 +64,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     playSound('click', isSoundEnabled);
     setLanguage(newLang);
   };
+  
+  const handleApiKeySave = () => {
+    playSound('click', isSoundEnabled);
+    setApiKey(localApiKey);
+    setKeySaved(true);
+    setTimeout(() => setKeySaved(false), 2000); // Hide message after 2s
+  };
 
   if (!isOpen) return null;
 
@@ -64,6 +80,23 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         <h2 className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-6">{t('appSettings')}</h2>
         
         <div className="space-y-6">
+          {/* API Key Setting */}
+          <div className="border-b pb-4 border-gray-200 dark:border-gray-600">
+             <label className="font-bold text-gray-700 dark:text-gray-200">Google AI API Key</label>
+             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Your key is stored only in your browser.</p>
+             <div className="flex gap-2 mt-2">
+                <input
+                    type="password"
+                    value={localApiKey}
+                    onChange={(e) => setLocalApiKey(e.target.value)}
+                    placeholder="Enter your API Key"
+                    className="w-full p-2 text-sm border border-gray-300 dark:border-gray-500 rounded-lg dark:bg-gray-700"
+                />
+                 <button onClick={handleApiKeySave} className="px-4 py-2 text-sm font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    {keySaved ? '✓' : 'Save'}
+                 </button>
+             </div>
+          </div>
           {/* Theme Setting */}
           <div>
             <label className="font-bold text-gray-700 dark:text-gray-200">{t('theme')}</label>

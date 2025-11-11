@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { LocalizationProvider } from './hooks/useLocalization';
 import { CommunityStory, ReactionType, ShopItem, AvatarState, ProgressStep } from './types';
@@ -23,11 +22,14 @@ import FreedomFightersZone from './components/FreedomFightersZone';
 import ShopScreen from './components/ShopScreen';
 import GTCGalleryScreen from './components/GTCGalleryScreen';
 import { SHOP_ITEMS } from './data/shopItems';
+import { useApiKey } from './hooks/useApiKey';
+import ApiKeyModal from './components/ApiKeyModal';
 
 type AppStep = 'welcome' | 'lesson' | 'demo' | 'practice' | 'rewards' | 'hub';
 type AppScreen = 'hub' | 'create' | 'learn' | 'storyHub' | 'teacher' | 'ethics' | 'freedomFighters' | 'shop' | 'gtcGallery';
 
 const App: React.FC = () => {
+  const { isKeySet } = useApiKey();
   const [userName, setUserName] = useState<string | null>(localStorage.getItem('userName'));
   const [appStep, setAppStep] = useState<AppStep>(userName ? 'hub' : 'welcome');
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('hub');
@@ -219,6 +221,7 @@ const App: React.FC = () => {
                 isTeacherMode={isTeacherMode}
                 setIsTeacherMode={setIsTeacherMode}
             />
+            <ApiKeyModal isOpen={!isKeySet} />
         </div>
     </LocalizationProvider>
   );
