@@ -1,57 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Creativity & Code</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Import Map for ES Modules -->
+    <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "react": "https://aistudiocdn.com/react@^19.2.0"
+      }
+    }
+    </script>
+    
+    <!-- Babel for in-browser transpilation of TSX/JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Configure Tailwind CSS
+      tailwind.config = {
+        darkMode: 'class', // Enables toggling dark mode via a class on the html element
+        theme: {
+          extend: {
+            fontFamily: {
+              'default': ['"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+              'dyslexia-friendly': ['OpenDyslexic', 'Arial', 'sans-serif'],
+            },
+            animation: {
+              'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+            },
+            keyframes: {
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- Font for Dyslexia-Friendly Mode -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/opendyslexic@0.1.2/build/opendyslexic.min.css">
+    
     <style>
-      :root {
-        --font-default: 'Poppins', sans-serif;
-        --font-dyslexia-friendly: 'Lexend', sans-serif;
-      }
-      .font-default {
-        font-family: var(--font-default);
-      }
-      .font-dyslexia-friendly {
-        font-family: var(--font-dyslexia-friendly);
-      }
-      @keyframes badge-earn {
-        0% {
-          transform: scale(0.5) rotate(-15deg);
-          opacity: 0;
-        }
-        60% {
-          transform: scale(1.1) rotate(5deg);
-          opacity: 1;
-        }
-        100% {
-          transform: scale(1) rotate(0deg);
-          opacity: 1;
-        }
-      }
-      .animate-badge-earn {
-        animation: badge-earn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      /* Simple global styles to prevent content overflow issues */
+      body {
+        overscroll-behavior-y: contain;
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
-  }
-}
-</script>
 </head>
-  <body>
+<body>
+    <!-- The root element for the React application -->
     <div id="root"></div>
+    
+    <!-- The main application script. 
+         type="text/babel" tells Babel to transpile this.
+         data-type="module" ensures it's treated as an ES module.
+         It's placed at the end of the body to ensure the #root element exists before the script runs. -->
     <script type="text/babel" data-type="module" src="./index.tsx"></script>
-  </body>
+</body>
 </html>
