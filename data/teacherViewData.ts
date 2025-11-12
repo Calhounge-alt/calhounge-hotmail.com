@@ -1,4 +1,4 @@
-import { ProgressStep } from "../types";
+import { ProgressStep } from "../types.ts";
 
 export interface StudentJournalEntries {
   story: string;

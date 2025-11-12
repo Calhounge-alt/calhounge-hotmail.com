@@ -1,4 +1,4 @@
-import { CommunityStory } from "../types";
+import { CommunityStory } from "../types.ts";
 
 export const INITIAL_COMMUNITY_STORIES: CommunityStory[] = [
   {

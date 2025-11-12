@@ -1,6 +1,7 @@
 
+
 import React from 'react';
-import SidekickAvatar from './SidekickAvatar';
+import SidekickAvatar from './SidekickAvatar.tsx';
 
 const SidekickBuilder: React.FC = () => {
     return (

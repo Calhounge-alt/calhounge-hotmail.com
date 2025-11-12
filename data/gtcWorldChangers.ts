@@ -1,4 +1,4 @@
-import { GTCWorldChangerStory } from "../types";
+import { GTCWorldChangerStory } from "../types.ts";
 
 export const GTC_WORLD_CHANGERS_STORIES: GTCWorldChangerStory[] = [
   {

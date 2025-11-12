@@ -1,3 +1,5 @@
+
+
 export interface FreedomFighterScenario {
   id: number;
   character: 'Joshua' | 'Ruby' | 'Benjamin';

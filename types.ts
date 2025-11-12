@@ -160,3 +160,13 @@ export interface AvatarState {
 
 // For sound effects
 export type SoundEffect = 'click' | 'success' | 'whoosh' | 'badge' | 'purchase' | 'error';
+// FIX: Added the FreedomFighterScenario type definition.
+// For Freedom Fighters Zone
+export interface FreedomFighterScenario {
+  id: number;
+  character: 'Joshua' | 'Ruby' | 'Benjamin';
+  title: string;
+  description: string;
+  imageUrl: string;
+  prompt: string;
+}
