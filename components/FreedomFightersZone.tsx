@@ -1,5 +1,7 @@
 import React from 'react';
-import { FREEDOM_FIGHTERS_SCENARIOS, FreedomFighterScenario } from '../data/freedomFightersScenarios.ts';
+// FIX: Imported FreedomFighterScenario from types.ts where it is defined, instead of from freedomFightersScenarios.ts.
+import { FREEDOM_FIGHTERS_SCENARIOS } from '../data/freedomFightersScenarios.ts';
+import { FreedomFighterScenario } from '../types.ts';
 import { playSound } from '../utils/soundUtils.ts';
 
 interface FreedomFightersZoneProps {

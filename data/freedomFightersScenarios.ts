@@ -1,13 +1,4 @@
-
-
-export interface FreedomFighterScenario {
-  id: number;
-  character: 'Joshua' | 'Ruby' | 'Benjamin';
-  title: string;
-  description: string;
-  imageUrl: string;
-  prompt: string;
-}
+import { FreedomFighterScenario } from '../types.ts';
 
 export const FREEDOM_FIGHTERS_SCENARIOS: FreedomFighterScenario[] = [
   {

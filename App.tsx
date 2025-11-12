@@ -22,14 +22,11 @@ import FreedomFightersZone from './components/FreedomFightersZone.tsx';
 import ShopScreen from './components/ShopScreen.tsx';
 import GTCGalleryScreen from './components/GTCGalleryScreen.tsx';
 import { SHOP_ITEMS } from './data/shopItems.ts';
-import { useApiKey } from './hooks/useApiKey.tsx';
-import ApiKeyModal from './components/ApiKeyModal.tsx';
 
 type AppStep = 'welcome' | 'lesson' | 'demo' | 'practice' | 'rewards' | 'hub';
 type AppScreen = 'hub' | 'create' | 'learn' | 'storyHub' | 'teacher' | 'ethics' | 'freedomFighters' | 'shop' | 'gtcGallery';
 
 const App: React.FC = () => {
-  const { isKeySet } = useApiKey();
   const [userName, setUserName] = useState<string | null>(localStorage.getItem('userName'));
   const [appStep, setAppStep] = useState<AppStep>(userName ? 'hub' : 'welcome');
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('hub');
@@ -221,7 +218,6 @@ const App: React.FC = () => {
                 isTeacherMode={isTeacherMode}
                 setIsTeacherMode={setIsTeacherMode}
             />
-            <ApiKeyModal isOpen={!isKeySet} />
         </div>
     </LocalizationProvider>
   );

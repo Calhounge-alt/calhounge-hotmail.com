@@ -1,9 +1,8 @@
 
-
-
-import React, { useState, useEffect } from 'react';
-import { analyzePrompt } from '../services/geminiService.ts';
+import React, { useState, useEffect, useRef } from 'react';
+import { analyzePrompt, generateSpeech } from '../services/geminiService.ts';
 import { PromptAnalysis } from '../types.ts';
+import { decode, decodeAudioData } from '../utils/audioUtils.ts';
 import PromptTemplates from './PromptTemplates.tsx';
 import { playSound } from '../utils/soundUtils.ts';
 
@@ -18,9 +17,23 @@ const PromptPractice: React.FC<PromptPracticeProps> = ({ setNextDisabled, isSoun
     const [analysisResult, setAnalysisResult] = useState<PromptAnalysis | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
 
+    const audioContextRef = useRef<AudioContext | null>(null);
+    const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
+
     useEffect(() => {
       setNextDisabled(reflection.trim().length < 10);
     }, [reflection, setNextDisabled]);
+
+    useEffect(() => {
+        return () => {
+            if (audioSourceRef.current) {
+                audioSourceRef.current.stop();
+            }
+            if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+                audioContextRef.current.close().catch(console.error);
+            }
+        };
+    }, []);
 
 
     const PromptExample = ({ type, prompt, description, title }: {type: 'Vague' | 'Strong', prompt: string, description: string, title: string}) => (
@@ -31,6 +44,29 @@ const PromptPractice: React.FC<PromptPracticeProps> = ({ setNextDisabled, isSoun
             <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
         </div>
     );
+    
+    const playAudio = async (base64Audio: string) => {
+        try {
+            if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+                audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+            }
+            if (audioContextRef.current.state === 'suspended') {
+                await audioContextRef.current.resume();
+            }
+            if (audioSourceRef.current) {
+                audioSourceRef.current.stop();
+            }
+            const audioBytes = decode(base64Audio);
+            const buffer = await decodeAudioData(audioBytes, audioContextRef.current, 24000, 1);
+            const source = audioContextRef.current.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioContextRef.current.destination);
+            source.start(0);
+            audioSourceRef.current = source;
+        } catch (error) {
+            console.error("Error playing feedback audio:", error);
+        }
+    };
 
     const handleAnalyzePrompt = async () => {
         if (!userPrompt.trim()) return;
@@ -42,6 +78,12 @@ const PromptPractice: React.FC<PromptPracticeProps> = ({ setNextDisabled, isSoun
         setIsAnalyzing(false);
         if (result && result.score > 0) {
             playSound('success', isSoundEnabled);
+            // Generate and play audio feedback
+            const feedbackText = `${result.title}. Your prompt score is ${result.score} out of 10.`;
+            const audioData = await generateSpeech(feedbackText);
+            if (audioData) {
+                await playAudio(audioData);
+            }
         } else {
             playSound('error', isSoundEnabled);
         }

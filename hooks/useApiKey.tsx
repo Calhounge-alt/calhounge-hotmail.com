@@ -1,5 +1,8 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { initializeAiClient, isAiClientInitialized } from '../services/geminiService.ts';
+import React, { createContext, useContext, ReactNode } from 'react';
+
+// Per new guidelines, API key should not be managed through UI.
+// This component and hook are deprecated and made non-functional to resolve build errors
+// and align with the requirement of using process.env.API_KEY exclusively.
 
 interface ApiKeyContextType {
   apiKey: string | null;
@@ -10,35 +13,14 @@ interface ApiKeyContextType {
 const ApiKeyContext = createContext<ApiKeyContextType | undefined>(undefined);
 
 export const ApiKeyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [apiKey, _setApiKey] = useState<string | null>(() => localStorage.getItem('gemini-api-key'));
-
-  useEffect(() => {
-    // Initialize the client on first load if a key exists
-    if (apiKey && !isAiClientInitialized()) {
-      try {
-        initializeAiClient(apiKey);
-      } catch (error) {
-         console.error("Failed to initialize AI client with stored key:", error);
-         // Clear the bad key
-         localStorage.removeItem('gemini-api-key');
-         _setApiKey(null);
-      }
-    }
-  }, [apiKey]);
-
-  const setApiKey = (key: string) => {
-    const trimmedKey = key.trim();
-    if(trimmedKey) {
-        localStorage.setItem('gemini-api-key', trimmedKey);
-        initializeAiClient(trimmedKey);
-        _setApiKey(trimmedKey);
-    }
+  const value = {
+    apiKey: null,
+    isKeySet: true, // Assume key is set via environment variables.
+    setApiKey: () => { /* no-op */ },
   };
 
-  const isKeySet = !!apiKey;
-
   return (
-    <ApiKeyContext.Provider value={{ apiKey, isKeySet, setApiKey }}>
+    <ApiKeyContext.Provider value={value}>
       {children}
     </ApiKeyContext.Provider>
   );

@@ -8,6 +8,7 @@ import VoiceSelector from './VoiceSelector.tsx';
 import CharacterCustomizer from './CharacterCustomizer.tsx';
 import MusicCreator from './MusicCreator.tsx';
 import LabJournal from './LabJournal.tsx';
+// FIX: Import StopIcon for new audio controls.
 import { PlayIcon, PauseIcon, StopIcon } from './Icons.tsx';
 import PromptTemplates from './PromptTemplates.tsx';
 import InspirationDeckModal from './InspirationDeckModal.tsx';
@@ -26,7 +27,6 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
   const [explainedPrompt, setExplainedPrompt] = useState('');
   const [story, setStory] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [audioUrl, setAudioUrl] = useState('');
   const [musicUrl, setMusicUrl] = useState('');
 
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({
@@ -46,8 +46,11 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
 
   const [journal, setJournal] = useState({ story: '', art: '', music: '', reflection: '' });
 
-  const [isNarrationPlaying, setIsNarrationPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
+  // FIX: Refactor audio playback from <audio> tag to AudioContext for raw PCM data.
+  const [narrationStatus, setNarrationStatus] = useState<'idle' | 'loading' | 'playing' | 'paused'>('idle');
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioBufferRef = useRef<AudioBuffer | null>(null);
+  const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
   
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const musicRef = useRef<HTMLAudioElement>(null);
@@ -66,6 +69,17 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
       localStorage.removeItem('initialPrompt');
     }
   }, []);
+  
+  // FIX: Add useEffect to clean up audio context on unmount.
+  useEffect(() => {
+    return () => {
+      if (audioSourceRef.current) audioSourceRef.current.stop();
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close();
+      }
+    };
+  }, []);
+
 
   useEffect(() => {
     if (story) setCompletedSteps(prev => new Set(prev).add('story'));
@@ -112,18 +126,83 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
     setLoading('image', false);
   };
 
+  // FIX: Audio helper functions for AudioContext playback.
+  const resetNarrationAudio = (clearState: boolean = true) => {
+    if (audioSourceRef.current) {
+        audioSourceRef.current.onended = null;
+        audioSourceRef.current.stop();
+        audioSourceRef.current = null;
+    }
+    if (clearState) {
+      audioBufferRef.current = null;
+      setNarrationStatus('idle');
+    }
+  };
+
+  const playNarrationAudio = () => {
+      const audioBuffer = audioBufferRef.current;
+      if (!audioBuffer) return;
+  
+      if (audioContextRef.current?.state === 'suspended') {
+          audioContextRef.current.resume().then(() => setNarrationStatus('playing'));
+          return;
+      }
+  
+      resetNarrationAudio(false);
+  
+      const source = audioContextRef.current!.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(audioContextRef.current!.destination);
+      source.start(0);
+      source.onended = () => {
+           setNarrationStatus(current => (current === 'playing' ? 'idle' : current));
+      };
+      audioSourceRef.current = source;
+      setNarrationStatus('playing');
+  };
+
+  const handlePlayPauseNarration = () => {
+      playSound('click', isSoundEnabled);
+      if (!audioContextRef.current || !audioBufferRef.current) return;
+      if (narrationStatus === 'playing') {
+        audioContextRef.current.suspend().then(() => setNarrationStatus('paused'));
+      } else {
+        playNarrationAudio();
+      }
+  };
+
+  const handleStopNarration = () => {
+      playSound('click', isSoundEnabled);
+      resetNarrationAudio(true);
+  };
+
   const handleGenerateAudio = async () => {
     if (!story) return;
     playSound('click', isSoundEnabled);
+    resetNarrationAudio(true);
+
     setLoading('audio', true);
-    setAudioUrl('');
+    setNarrationStatus('loading');
     const base64Audio = await generateSpeech(story, selectedVoice);
+    
     if (base64Audio) {
-      const audioBytes = decode(base64Audio);
-      const audioBlob = new Blob([audioBytes], { type: 'audio/webm' }); // Use a standard type
-      const url = URL.createObjectURL(audioBlob);
-      setAudioUrl(url);
-      playSound('success', isSoundEnabled);
+        try {
+            if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+                audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+            }
+            const audioBytes = decode(base64Audio);
+            const buffer = await decodeAudioData(audioBytes, audioContextRef.current, 24000, 1);
+            audioBufferRef.current = buffer;
+            playNarrationAudio();
+            playSound('success', isSoundEnabled);
+        } catch (error) {
+            console.error("Error processing audio:", error);
+            resetNarrationAudio(true);
+            alert("Sorry, an error occurred while trying to play the audio.");
+        }
+    } else {
+        resetNarrationAudio(true);
+        alert("Sorry, we couldn't generate audio right now.");
     }
     setLoading('audio', false);
   };
@@ -156,18 +235,6 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
 
   const handleJournalChange = (key: keyof typeof journal, value: string) => {
     setJournal(prev => ({ ...prev, [key]: value }));
-  };
-
-  const toggleNarration = () => {
-    playSound('click', isSoundEnabled);
-    if (audioRef.current) {
-        if(isNarrationPlaying) {
-            audioRef.current.pause();
-        } else {
-            audioRef.current.play();
-        }
-        setIsNarrationPlaying(!isNarrationPlaying);
-    }
   };
 
   const toggleMusic = () => {
@@ -280,11 +347,14 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
           <button onClick={handleGenerateAudio} disabled={isLoading.audio || !story} className="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 dark:disabled:bg-gray-500">
             {isLoading.audio ? 'Recording...' : 'Generate Narration'}
           </button>
-          {audioUrl && (
+          {/* FIX: Replaced <audio> tag with AudioContext-based controls. */}
+          {(narrationStatus === 'playing' || narrationStatus === 'paused') && (
             <div className="flex items-center gap-2">
-              <audio ref={audioRef} src={audioUrl} onPlay={() => setIsNarrationPlaying(true)} onPause={() => setIsNarrationPlaying(false)} onEnded={() => setIsNarrationPlaying(false)} />
-              <button onClick={toggleNarration}>
-                {isNarrationPlaying ? <PauseIcon className="h-8 w-8 text-indigo-600" /> : <PlayIcon className="h-8 w-8 text-indigo-600" />}
+              <button onClick={handlePlayPauseNarration} aria-label={narrationStatus === 'playing' ? 'Pause narration' : 'Play narration'}>
+                {narrationStatus === 'playing' ? <PauseIcon className="h-8 w-8 text-indigo-600" /> : <PlayIcon className="h-8 w-8 text-indigo-600" />}
+              </button>
+               <button onClick={handleStopNarration} aria-label="Stop narration">
+                <StopIcon className="h-8 w-8 text-gray-600 dark:text-gray-400" />
               </button>
               <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">Listen to your story!</p>
             </div>

@@ -60,10 +60,78 @@
     <!-- The root element for the React application -->
     <div id="root"></div>
     
-    <!-- The main application script. 
-         type="text/babel" tells Babel to transpile this.
-         data-type="module" ensures it's treated as an ES module.
-         It's placed at the end of the body to ensure the #root element exists before the script runs. -->
-    <script type="text/babel" data-type="module" src="./index.tsx"></script>
+    <!-- Dynamic Module Loader -->
+    <script type="module">
+      const transpiledModules = new Map();
+
+      async function loadModule(path) {
+        // 1. Check cache
+        if (transpiledModules.has(path)) {
+          return transpiledModules.get(path);
+        }
+
+        // 2. Fetch source code
+        const response = await fetch(path);
+        if (!response.ok) throw new Error(`Failed to fetch ${path}: ${response.statusText}`);
+        let sourceCode = await response.text();
+
+        // 3. Find dependencies
+        const dependencyRegex = /from\s+['"]((?:\.\/|\.\.\/).*?(\.tsx|\.ts))['"]/g;
+        const dependencies = [];
+        let match;
+        while ((match = dependencyRegex.exec(sourceCode))) {
+          dependencies.push(match[1]);
+        }
+
+        // 4. Recursively load and resolve dependencies
+        const resolvedDeps = await Promise.all(
+          dependencies.map(async (depPath) => {
+            const absoluteDepUrl = new URL(depPath, path).href;
+            const blobUrl = await loadModule(absoluteDepUrl);
+            return { originalPath: depPath, blobUrl };
+          })
+        );
+
+        // 5. Rewrite import paths in the source code to use Blob URLs
+        for (const dep of resolvedDeps) {
+          const regex = new RegExp(`from\\s+['"]${dep.originalPath}['"]`, 'g');
+          sourceCode = sourceCode.replace(regex, `from "${dep.blobUrl}"`);
+        }
+
+        // 6. Transpile the rewritten code using Babel
+        const transpiled = Babel.transform(sourceCode, {
+          presets: ["react", "typescript"],
+          filename: path, // Important for better error messages
+        }).code;
+
+        // 7. Create a Blob and an Object URL for the transpiled JS
+        const blob = new Blob([transpiled], { type: 'application/javascript' });
+        const blobUrl = URL.createObjectURL(blob);
+
+        // 8. Cache and return the Blob URL
+        transpiledModules.set(path, blobUrl);
+        return blobUrl;
+      }
+
+      // Entry point for the application
+      (async () => {
+        try {
+          const entryPointUrl = new URL('index.tsx', window.location.href).href;
+          const appUrl = await loadModule(entryPointUrl);
+          // Dynamically import the final, fully-resolved module
+          import(appUrl);
+        } catch (error) {
+          console.error("Error loading application:", error);
+          const root = document.getElementById('root');
+          if (root) {
+            root.innerHTML = `<div style="padding: 2rem; font-family: sans-serif; color: #ff3333; background-color: #1a0000; border-radius: 8px;">
+                <h2 style="font-size: 1.5rem;">Application failed to load</h2>
+                <p style="margin-top: 1rem;">Could not fetch or transpile the source files. Please check the browser console for more details.</p>
+                <pre style="margin-top: 1rem; padding: 1rem; background-color: #330000; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word;">${error.message}</pre>
+            </div>`;
+          }
+        }
+      })();
+    </script>
 </body>
 </html>
