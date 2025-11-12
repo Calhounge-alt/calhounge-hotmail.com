@@ -94,7 +94,9 @@
 
         // 5. Rewrite import paths in the source code to use Blob URLs
         for (const dep of resolvedDeps) {
-          const regex = new RegExp(`from\\s+['"]${dep.originalPath}['"]`, 'g');
+          // Escape special characters in path for RegExp
+          const escapedOriginalPath = dep.originalPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(`from\\s+['"]${escapedOriginalPath}['"]`, 'g');
           sourceCode = sourceCode.replace(regex, `from "${dep.blobUrl}"`);
         }
 

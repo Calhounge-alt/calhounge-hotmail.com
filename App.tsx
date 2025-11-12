@@ -22,6 +22,7 @@ import FreedomFightersZone from './components/FreedomFightersZone.tsx';
 import ShopScreen from './components/ShopScreen.tsx';
 import GTCGalleryScreen from './components/GTCGalleryScreen.tsx';
 import { SHOP_ITEMS } from './data/shopItems.ts';
+import AccessRequestModal from './components/AccessRequestModal.tsx';
 
 type AppStep = 'welcome' | 'lesson' | 'demo' | 'practice' | 'rewards' | 'hub';
 type AppScreen = 'hub' | 'create' | 'learn' | 'storyHub' | 'teacher' | 'ethics' | 'freedomFighters' | 'shop' | 'gtcGallery';
@@ -38,6 +39,7 @@ const App: React.FC = () => {
   const [isTeacherMode, setIsTeacherMode] = useState(false);
   
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAccessRequestOpen, setIsAccessRequestOpen] = useState(false);
   const [isNextDisabled, setNextDisabled] = useState(true);
 
   const [communityStories, setCommunityStories] = useState<CommunityStory[]>(INITIAL_COMMUNITY_STORIES);
@@ -183,6 +185,8 @@ const App: React.FC = () => {
   };
 
   const showNav = appStep !== 'welcome' && appStep !== 'hub';
+  // The Hub button should show everywhere EXCEPT the hub screen itself.
+  const showHubButton = !(appStep === 'hub' && currentScreen === 'hub');
 
   return (
     <LocalizationProvider language={language} setLanguage={setLanguage}>
@@ -191,7 +195,7 @@ const App: React.FC = () => {
                 userName={userName || 'Creator'}
                 onSettingsClick={() => setIsSettingsOpen(true)}
                 onHubClick={() => navigateToScreen('hub')}
-                showHubButton={!(appStep === 'hub' && currentScreen === 'hub')}
+                showHubButton={showHubButton}
                 avatarState={avatarState}
                 coins={coins}
                 isSoundEnabled={isSoundEnabled}
@@ -202,7 +206,18 @@ const App: React.FC = () => {
             
             {showNav && <GlobalNav onBack={handleBack} onNext={handleNext} showBack={appStep !== 'lesson'} showNext={appStep !== 'rewards'} isNextDisabled={isNextDisabled} isSoundEnabled={isSoundEnabled} />}
             
-            <OnboardingModal isOpen={appStep === 'welcome' && !userName} onNameSet={handleNameSet} isSoundEnabled={isSoundEnabled} />
+            <OnboardingModal 
+                isOpen={appStep === 'welcome' && !userName} 
+                onNameSet={handleNameSet} 
+                isSoundEnabled={isSoundEnabled} 
+                onAccessRequestClick={() => setIsAccessRequestOpen(true)}
+            />
+
+            <AccessRequestModal
+                isOpen={isAccessRequestOpen}
+                onClose={() => setIsAccessRequestOpen(false)}
+                isSoundEnabled={isSoundEnabled}
+            />
 
             <SettingsModal 
                 isOpen={isSettingsOpen}

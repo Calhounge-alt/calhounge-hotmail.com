@@ -20,7 +20,8 @@ interface LocalizationProviderProps {
     setLanguage: (language: Language) => void;
 }
 
-export const LocalizationProvider = ({ children, language, setLanguage }: LocalizationProviderProps) => {
+// FIX: Explicitly type LocalizationProvider as a React.FC to ensure correct type inference for JSX children in .tsx files.
+export const LocalizationProvider: React.FC<LocalizationProviderProps> = ({ children, language, setLanguage }) => {
   const t = (key: TranslationKey, params?: Record<string, string | number>): string => {
     let text: string = (translations[language] && translations[language][key]) || translations['en'][key];
     if (params) {
@@ -32,6 +33,8 @@ export const LocalizationProvider = ({ children, language, setLanguage }: Locali
     return text;
   };
 
+  // FIX: Using React.createElement instead of JSX because this is a .ts file, not a .tsx file.
+  // JSX is not valid in .ts files by default and was causing parsing errors.
   return React.createElement(LocalizationContext.Provider, { value: { language, setLanguage, t } }, children);
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArtStyle, Vibe, VoiceName, Character, ProgressStep } from '../types.ts';
-import { explainPrompt, generateStory, generateImage, generateSpeech } from '../services/geminiService.ts';
+import { generateStory, generateImage, generateSpeech } from '../services/geminiService.ts';
 import { decode, decodeAudioData } from '../utils/audioUtils.ts';
 import { playSound } from '../utils/soundUtils.ts';
 import VibeSelector from './VibeSelector.tsx';
@@ -8,13 +8,12 @@ import VoiceSelector from './VoiceSelector.tsx';
 import CharacterCustomizer from './CharacterCustomizer.tsx';
 import MusicCreator from './MusicCreator.tsx';
 import LabJournal from './LabJournal.tsx';
-// FIX: Import StopIcon for new audio controls.
 import { PlayIcon, PauseIcon, StopIcon } from './Icons.tsx';
-import PromptTemplates from './PromptTemplates.tsx';
 import InspirationDeckModal from './InspirationDeckModal.tsx';
 import SubmissionModal from './SubmissionModal.tsx';
 import ProgressHUD from './ProgressHUD.tsx';
 import CreativityMeterModal from './CreativityMeterModal.tsx';
+import StructuredPromptBuilder from './StructuredPromptBuilder.tsx';
 
 interface CreateScreenProps {
   onBackToHub: () => void;
@@ -24,13 +23,14 @@ interface CreateScreenProps {
 
 const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGallery, isSoundEnabled }) => {
   const [prompt, setPrompt] = useState('');
-  const [explainedPrompt, setExplainedPrompt] = useState('');
   const [story, setStory] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [musicUrl, setMusicUrl] = useState('');
+  
+  const [initialPrompt, setInitialPrompt] = useState<string | undefined>(undefined);
 
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({
-    explain: false, story: false, image: false, audio: false
+    story: false, image: false, audio: false
   });
 
   const [selectedVibe, setSelectedVibe] = useState<Vibe | null>(null);
@@ -46,7 +46,6 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
 
   const [journal, setJournal] = useState({ story: '', art: '', music: '', reflection: '' });
 
-  // FIX: Refactor audio playback from <audio> tag to AudioContext for raw PCM data.
   const [narrationStatus, setNarrationStatus] = useState<'idle' | 'loading' | 'playing' | 'paused'>('idle');
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioBufferRef = useRef<AudioBuffer | null>(null);
@@ -63,14 +62,13 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
   const [imaginationPower, setImaginationPower] = useState(50);
 
   useEffect(() => {
-    const initialPrompt = localStorage.getItem('initialPrompt');
-    if (initialPrompt) {
-      setPrompt(initialPrompt);
+    const promptFromStorage = localStorage.getItem('initialPrompt');
+    if (promptFromStorage) {
+      setInitialPrompt(promptFromStorage);
       localStorage.removeItem('initialPrompt');
     }
   }, []);
   
-  // FIX: Add useEffect to clean up audio context on unmount.
   useEffect(() => {
     return () => {
       if (audioSourceRef.current) audioSourceRef.current.stop();
@@ -89,15 +87,6 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
   }, [story, imageUrl, musicUrl, journal.reflection]);
 
   const setLoading = (key: string, value: boolean) => setIsLoading(prev => ({ ...prev, [key]: value }));
-
-  const handleExplainPrompt = async () => {
-    if (!prompt) return;
-    playSound('click', isSoundEnabled);
-    setLoading('explain', true);
-    const explanation = await explainPrompt(prompt);
-    setExplainedPrompt(explanation);
-    setLoading('explain', false);
-  };
 
   const handleGenerateStory = async () => {
     if (!prompt) return;
@@ -126,7 +115,6 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
     setLoading('image', false);
   };
 
-  // FIX: Audio helper functions for AudioContext playback.
   const resetNarrationAudio = (clearState: boolean = true) => {
     if (audioSourceRef.current) {
         audioSourceRef.current.onended = null;
@@ -272,23 +260,17 @@ const CreateScreen: React.FC<CreateScreenProps> = ({ onBackToHub, onSubmitToGall
       <div className="lg:col-span-1 space-y-6">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
           <h3 className="text-xl font-bold text-gray-700 dark:text-gray-100">1. Start with an Idea</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">What's your story about?</p>
-          <PromptTemplates onSelect={p => setPrompt(p)} />
-          <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="e.g., A robot who learns to bake cakes"
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg h-24 dark:bg-gray-700"
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Build your story piece by piece. Use the 💡 for help!</p>
+          <StructuredPromptBuilder
+            initialPrompt={initialPrompt}
+            onChange={setPrompt}
+            isSoundEnabled={isSoundEnabled}
           />
-          <div className="flex gap-2 mt-2">
-            <button onClick={handleExplainPrompt} disabled={isLoading.explain || !prompt} className="w-full bg-gray-200 dark:bg-gray-600 text-sm font-bold py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50">
-              {isLoading.explain ? 'Thinking...' : 'AI-dea Boost'}
-            </button>
+          <div className="flex gap-2 mt-4">
             <button onClick={() => { playSound('click', isSoundEnabled); setIsInspirationOpen(true); }} className="w-full bg-yellow-400 text-yellow-900 text-sm font-bold py-2 rounded-lg hover:bg-yellow-500">
-              Get Inspired
+              Draw a Card for a Full Idea
             </button>
           </div>
-          {explainedPrompt && <p className="text-sm italic text-blue-600 dark:text-blue-400 mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-md">{explainedPrompt}</p>}
         </div>
         
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">

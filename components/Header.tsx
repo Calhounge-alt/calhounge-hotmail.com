@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { useTranslation } from '../hooks/useLocalization.ts';
 import AvatarDisplay from './AvatarDisplay.tsx';

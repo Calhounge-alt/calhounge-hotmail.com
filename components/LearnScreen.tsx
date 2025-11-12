@@ -44,7 +44,22 @@ const learnContent = [
 
 type NarrationStatus = 'idle' | 'loading' | 'playing' | 'paused';
 
-const AccordionItem = ({ 
+// FIX: Defined a dedicated props interface for AccordionItem and explicitly typed it as a React.FC
+// to resolve the typing error with the 'key' prop.
+interface AccordionItemProps {
+    icon: string;
+    title: string;
+    content: string;
+    isOpen: boolean;
+    onClick: () => void;
+    narrationStatus: NarrationStatus;
+    onNarrateClick: () => Promise<void>;
+    onPlayPauseClick: () => void;
+    onStopClick: () => void;
+    isSoundEnabled: boolean;
+}
+
+const AccordionItem: React.FC<AccordionItemProps> = ({ 
     icon, 
     title, 
     content, 
@@ -55,17 +70,6 @@ const AccordionItem = ({
     onPlayPauseClick, 
     onStopClick,
     isSoundEnabled,
-}: { 
-    icon: string, 
-    title: string, 
-    content: string, 
-    isOpen: boolean, 
-    onClick: () => void,
-    narrationStatus: NarrationStatus,
-    onNarrateClick: () => void,
-    onPlayPauseClick: () => void,
-    onStopClick: () => void,
-    isSoundEnabled: boolean,
 }) => {
     const handleNarrate = () => {
         playSound('click', isSoundEnabled);
@@ -259,7 +263,7 @@ const LearnScreen: React.FC<LearnScreenProps> = ({ onBack, isSoundEnabled }) => 
 
       <div className="space-y-4">
         {learnContent.map((item, index) => (
-            <AccordionItem 
+            <AccordionItem
                 key={index}
                 icon={item.icon}
                 title={item.title}

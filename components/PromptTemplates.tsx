@@ -3,9 +3,10 @@ import { PROMPT_TEMPLATES } from '../data/promptTemplates.ts';
 
 interface PromptTemplatesProps {
   onSelect: (prompt: string) => void;
+  label?: string;
 }
 
-const PromptTemplates: React.FC<PromptTemplatesProps> = ({ onSelect }) => {
+const PromptTemplates: React.FC<PromptTemplatesProps> = ({ onSelect, label = 'Need an idea? Choose a template!' }) => {
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedPrompt = event.target.value;
     if (selectedPrompt) {
@@ -17,13 +18,13 @@ const PromptTemplates: React.FC<PromptTemplatesProps> = ({ onSelect }) => {
 
   return (
     <div className="mb-2">
-      <label htmlFor="prompt-template" className="block text-sm font-medium text-gray-700">
-        Need an idea? Choose a template!
+      <label htmlFor="prompt-template" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        {label}
       </label>
       <select
         id="prompt-template"
         onChange={handleChange}
-        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
         defaultValue=""
       >
         <option value="" disabled>

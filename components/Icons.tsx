@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 
 export const PlayIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
@@ -49,5 +50,13 @@ export const BadgeCheckIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) =
 export const HomeIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" {...props}>
         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+    </svg>
+);
+
+export const MicrophoneIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" {...props}>
+        <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z" />
+        <path d="M5.5 13a.5.5 0 00-1 0 5 5 0 004.5 5 5 5 0 004.5-5 .5.5 0 00-1 0 4 4 0 01-8 0z" />
+        <path d="M10 18a.5.5 0 00.5-.5v-2a.5.5 0 00-1 0v2A.5.5 0 0010 18z" />
     </svg>
 );

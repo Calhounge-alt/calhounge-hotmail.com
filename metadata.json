@@ -1,5 +1,7 @@
 {
   "name": "Creativity & Code",
   "description": "An interactive web and mobile app designed for students (grades 3–8), educators, and families to explore storytelling, literacy, and AI creativity together. It brings the Creativity & Code 60-Minute Workshop experience to life through guided, gamified activities.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "microphone"
+  ]
 }

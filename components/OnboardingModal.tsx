@@ -5,9 +5,10 @@ interface OnboardingModalProps {
   isOpen: boolean;
   onNameSet: (name: string) => void;
   isSoundEnabled: boolean;
+  onAccessRequestClick: () => void;
 }
 
-const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onNameSet, isSoundEnabled }) => {
+const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onNameSet, isSoundEnabled, onAccessRequestClick }) => {
   const [name, setName] = useState('');
   const prevIsOpen = useRef(isOpen);
 
@@ -24,6 +25,11 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onNameSet, is
       playSound('click', isSoundEnabled);
       onNameSet(name.trim());
     }
+  };
+  
+  const handleAccessRequest = () => {
+    playSound('click', isSoundEnabled);
+    onAccessRequestClick();
   };
 
   if (!isOpen) return null;
@@ -58,6 +64,14 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onNameSet, is
             Let's Begin!
           </button>
         </form>
+        <div className="mt-6 text-sm">
+            <p className="text-gray-500 dark:text-gray-400">
+                Need access for your class or family?{' '}
+                <button onClick={handleAccessRequest} className="font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 underline">
+                Request it here.
+                </button>
+            </p>
+        </div>
       </div>
     </div>
   );

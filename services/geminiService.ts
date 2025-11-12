@@ -21,6 +21,28 @@ export const explainPrompt = async (prompt: string): Promise<string> => {
   }
 };
 
+export const generatePromptPart = async (partName: string, existingPrompt: string): Promise<string> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: `Based on the following story idea, give me a creative suggestion for the "${partName}" part.
+      
+      Story Idea So Far: "${existingPrompt}"
+
+      Provide just one short, creative suggestion.`,
+      config: {
+        systemInstruction: `You are a helpful and imaginative assistant for kids writing stories. Provide a concise, creative suggestion (one sentence or a short phrase) for the requested story part. Do not add labels or explanations. Just return the text for the story part.`,
+        maxOutputTokens: 50,
+        temperature: 0.9,
+      }
+    });
+    return response.text.trim();
+  } catch (error) {
+    console.error(`Error generating prompt part for ${partName}:`, error);
+    return `Sorry, I couldn't think of an idea for ${partName} right now.`;
+  }
+};
+
 export const generateStory = async (prompt: string, vibe?: Vibe): Promise<string> => {
   try {
     const vibePrompts: Record<Vibe, string> = {
