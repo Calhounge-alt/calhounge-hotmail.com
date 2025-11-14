@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { LocalizationProvider } from './hooks/useLocalization.ts';
 import { CommunityStory, ReactionType, ShopItem, AvatarState, ProgressStep } from './types.ts';
@@ -156,7 +158,6 @@ const App: React.FC = () => {
     localStorage.setItem('purchasedItems', JSON.stringify(Array.from(purchasedItems)));
   }, [coins, avatarState, purchasedItems]);
 
-
   const renderContent = () => {
     if (appStep !== 'hub') {
       switch (appStep) {
@@ -190,7 +191,8 @@ const App: React.FC = () => {
 
   return (
     <LocalizationProvider language={language} setLanguage={setLanguage}>
-        <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 ${font === 'dyslexia-friendly' ? 'font-dyslexia-friendly' : 'font-default'}`}>
+        <div
+            className={`min-h-screen bg-slate-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 ${font === 'dyslexia-friendly' ? 'font-dyslexia-friendly' : 'font-default'}`}>
             <Header
                 userName={userName || 'Creator'}
                 onSettingsClick={() => setIsSettingsOpen(true)}
